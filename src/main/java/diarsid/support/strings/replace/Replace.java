@@ -25,12 +25,12 @@ public class Replace {
     }
     
     public Replace stringToString(String stringToReplace, String replacement) {
-        this.replacings.add(new StringBuilderStringReplacer(stringToReplace, replacement));
+        this.replacings.add(new StringBuilderStringReplacing(stringToReplace, replacement));
         return this;
     }    
     
     public Replace regexToString(String regexToReplace, String replacement) {
-        this.replacings.add(new StringBuilderRegexReplacer(regexToReplace, replacement));
+        this.replacings.add(new StringBuilderRegexReplacing(regexToReplace, replacement));
         return this;
     }
     

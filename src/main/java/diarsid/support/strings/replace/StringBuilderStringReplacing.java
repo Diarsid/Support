@@ -6,14 +6,14 @@
 package diarsid.support.strings.replace;
 
 
-class StringBuilderStringReplacer implements SingleReplacing {
+class StringBuilderStringReplacing implements SingleReplacing {
     
     private final String stringToReplace;
     private final String replacement;
     private final int stringToReplaceLength;
     private final int replacementLength;
 
-    public StringBuilderStringReplacer(String stringToReplace, String replacement) {
+    public StringBuilderStringReplacing(String stringToReplace, String replacement) {
         this.stringToReplace = stringToReplace;
         this.replacement = replacement;
         this.stringToReplaceLength = this.stringToReplace.length();

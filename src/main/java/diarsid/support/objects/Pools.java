@@ -27,11 +27,9 @@ import static diarsid.support.log.Logging.logFor;
 public class Pools {    
     
     private static final Map<Class, Pool> POOLS_BY_POOLED_CLASS;
-    private static final Map<Object, Pool> POOLS_BY_KEY;
     
     static {
         POOLS_BY_POOLED_CLASS = new HashMap<>();
-        POOLS_BY_KEY = new HashMap<>();
     }
     
     private Pools() { }
@@ -47,46 +45,16 @@ public class Pools {
         } 
     }
     
-    static <T extends PooledReusable> void createPool(Object key, Supplier<T> tSupplier) {
-        if ( key instanceof Class ) {
-            createPool((Class<T>) key, tSupplier);
-            return;
-        }
-        
-        synchronized ( POOLS_BY_KEY ) {
-            Pool<T> existedPool = POOLS_BY_KEY.get(key);
-            if ( existedPool == null ) {
-                Pool<T> newTPool = new Pool<>(tSupplier);
-                POOLS_BY_KEY.put(key, newTPool);
-                logFor(Pools.class).info(format(
-                        "Pool for %s:@%s created.", 
-                        key.getClass().getCanonicalName(), 
-                        key.hashCode()));
-            }       
-        }
+    static <T extends PooledReusable> Pool<T> nullablePoolOf(Class<T> type) {
+        return POOLS_BY_POOLED_CLASS.get(type);
     }
     
     public static <T extends PooledReusable> Optional<Pool<T>> poolOf(Class<T> type) {
         return Optional.ofNullable(POOLS_BY_POOLED_CLASS.get(type));
     }
     
-    public static <T extends PooledReusable> Optional<Pool<T>> poolOf(Object key, Class<T> type) {
-        return Optional.ofNullable((Pool<T>) POOLS_BY_KEY.get(type));
-    }
-    
     public static <T extends PooledReusable> T takeFromPool(Class<T> type) {
         Pool<T> pool = POOLS_BY_POOLED_CLASS.get(type);
-        T pooled;
-        if ( pool == null ) {
-            pooled = initializePoolAndGetInstanceOf(type);
-        } else {
-            pooled = pool.give();
-        }        
-        return pooled;
-    }
-    
-    public static <T extends PooledReusable> T takeFromPool(Object key, Class<T> type) {
-        Pool<T> pool = POOLS_BY_KEY.get(key);
         T pooled;
         if ( pool == null ) {
             pooled = initializePoolAndGetInstanceOf(type);
@@ -127,7 +95,7 @@ public class Pools {
                 .peek(constructor -> constructor.setAccessible(true))
                 .findFirst()
                 .orElseThrow(() -> {
-                    return new PoolException("Cannot found pooled no-args constructor!");
+                    return new PoolException("Cannot find pooled no-args constructor!");
                 });
         
         try {
@@ -147,12 +115,12 @@ public class Pools {
         pool.takeBack(pooleable);
     }
     
-    public static <T extends PooledReusable> void giveBackAllToPool(List<T> pooleable) {
-        if ( pooleable == null || pooleable.isEmpty() ) {
+    public static <T extends PooledReusable> void giveBackAllToPoolAndClear(List<T> pooleables) {
+        if ( pooleables == null || pooleables.isEmpty() ) {
             return;
         }
         
-        Pool<T> pool = POOLS_BY_POOLED_CLASS.get(pooleable.get(0).getPooleableClass());
-        pool.takeBackAll(pooleable);
+        Pool<T> pool = POOLS_BY_POOLED_CLASS.get(pooleables.get(0).getPooleableClass());
+        pool.takeBackAll(pooleables);
     }
 }

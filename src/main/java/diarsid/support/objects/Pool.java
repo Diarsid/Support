@@ -17,28 +17,38 @@ import java.util.function.Supplier;
  */
 public final class Pool<T extends PooledReusable> {
     
+    private final Object lock;
     private final Queue<T> queue;
     private final Supplier<T> tNewObjectSupplier;
     
     Pool(Supplier<T> newTSupplier) {
+        this.lock = new Object();
         this.queue = new ArrayDeque<>();
         this.tNewObjectSupplier = newTSupplier;
     }
     
+    Object lock() {
+        return this.lock;
+    }
+    
     public T give() {
-        synchronized ( this.queue ) {
+        synchronized ( this.lock ) {
+            T t;
             if ( this.queue.peek() == null ) {
-                T newT = this.tNewObjectSupplier.get();
-                return newT;
+                t = this.tNewObjectSupplier.get();
+                t.placedInPool();
             } else {
-                return this.queue.poll();
+                t = this.queue.poll();
             }
+            t.takenFromPool();
+            return t;
         }
     }
     
     public void takeBack(T t) {
         t.clearForReuse();
-        synchronized ( this.queue ) {
+        synchronized ( this.lock ) {
+            t.placedInPool();
             this.queue.offer(t);
         }
     }
@@ -47,8 +57,9 @@ public final class Pool<T extends PooledReusable> {
         for (T t : ts) {
             t.clearForReuse();
         }
-        synchronized ( this.queue ) {
+        synchronized ( this.lock ) {
             for (T t : ts) {
+                t.placedInPool();
                 this.queue.offer(t);
             }            
         }        

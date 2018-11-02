@@ -12,15 +12,15 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import diarsid.metainfo.ImpliedToBeThreadSafe;
-
 import static diarsid.support.log.Logging.logFor;
+
+import diarsid.metainfo.IntendedToBeThreadSafe;
 
 /**
  *
  * @author Diarsid
  */
-@ImpliedToBeThreadSafe
+@IntendedToBeThreadSafe
 class ReusableRegexMatchers {
     
     private static final Map<String, Queue<Matcher>> MATCHERS_BY_PATTERNS;
@@ -35,7 +35,7 @@ class ReusableRegexMatchers {
         
     }
     
-    static Matcher takeFor(Pattern pattern) {
+    static Matcher takeMatcherFor(Pattern pattern) {
         Matcher matcher;
         Queue<Matcher> matchers;
         
@@ -59,7 +59,7 @@ class ReusableRegexMatchers {
         return matcher;
     }
     
-    static void giveBack(Matcher matcher) {
+    static void giveMatcherBack(Matcher matcher) {
         Queue<Matcher> matchers;
         
         synchronized ( MATCHERS_BY_PATTERNS ) {

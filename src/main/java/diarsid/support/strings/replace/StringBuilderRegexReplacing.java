@@ -8,18 +8,18 @@ package diarsid.support.strings.replace;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import diarsid.metainfo.ImpliedToBeThreadSafe;
-
 import static java.util.regex.Pattern.compile;
 
-import static diarsid.support.strings.replace.ReusableRegexMatchers.giveBack;
-import static diarsid.support.strings.replace.ReusableRegexMatchers.takeFor;
+import diarsid.metainfo.IntendedToBeThreadSafe;
+
+import static diarsid.support.strings.replace.ReusableRegexMatchers.takeMatcherFor;
+import static diarsid.support.strings.replace.ReusableRegexMatchers.giveMatcherBack;
 
 /**
  *
  * @author Diarsid
  */
-@ImpliedToBeThreadSafe
+@IntendedToBeThreadSafe
 class StringBuilderRegexReplacing implements SingleReplacing {
     
     private final Pattern pattern;
@@ -34,7 +34,7 @@ class StringBuilderRegexReplacing implements SingleReplacing {
     
     @Override
     public void in(StringBuilder stringBuilder) {
-        Matcher matcher = takeFor(this.pattern).reset(stringBuilder);
+        Matcher matcher = takeMatcherFor(this.pattern).reset(stringBuilder);
         
         try {
             int start = 0;
@@ -47,7 +47,7 @@ class StringBuilderRegexReplacing implements SingleReplacing {
                 matcher.reset();
             }
         } finally {
-            giveBack(matcher);
+            giveMatcherBack(matcher);
         }    
     }
     

@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import diarsid.support.objects.Possible;
 
 import static java.lang.Boolean.parseBoolean;
@@ -27,7 +30,6 @@ import static java.util.stream.Collectors.joining;
 
 import static diarsid.support.configuration.ConfigurationReading.parseConfigLines;
 import static diarsid.support.configuration.ConfigurationReading.readConfigEntriesAsLinesFrom;
-import static diarsid.support.log.Logging.logFor;
 import static diarsid.support.objects.Possibles.allPresent;
 import static diarsid.support.objects.Possibles.possibleButEmpty;
 import static diarsid.support.objects.Possibles.possibleWith;
@@ -104,7 +106,14 @@ public class Configuration {
     }
     
     void logAll() {
-        options.entrySet()
+        if ( this.possibleBoolean("log").equalTo(false) ) {
+            return;
+        }
+        
+        Logger logger = LoggerFactory.getLogger(Configuration.class);
+        
+        this.options
+                .entrySet()
                 .stream()
                 .map((entry) -> {
                     String key = entry.getKey();
@@ -124,7 +133,7 @@ public class Configuration {
                     return key + " = " + valueString;
                 })
                 .sorted()
-                .forEach(line -> logFor(Configuration.class).info(line));                
+                .forEach(line -> logger.info(line));                
     }
     
     void takeUnconfiguredFrom(Configuration other) {

@@ -16,16 +16,20 @@ import static java.util.Arrays.stream;
 public class Possibles {    
     
     public static <T> Possible<T> possibleButEmpty() {
-        return new Possible<>(null);
+        return new RealPossible<>(null);
     }
     
     public static <T> Possible<T> possibleWith(T t) {
-        return new Possible<>(t);
+        return new RealPossible<>(t);
     }
     
     public static <T> Possible<T> possibleOf(Optional<T> optionalT) {
-        return new Possible<>(optionalT.orElse(null));
+        return new RealPossible<>(optionalT.orElse(null));
     }
+    
+    public static <T> PossibleListeneable<T> listeneable(Possible<T> possibleT) {
+        return new RealPossibleListeneable<>(possibleT.or(null));
+    }    
     
     public static boolean allPresent(Possible one, Possible two) {
         return one.isPresent() && two.isPresent();

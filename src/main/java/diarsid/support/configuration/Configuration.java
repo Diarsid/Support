@@ -9,8 +9,11 @@ package diarsid.support.configuration;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -27,6 +30,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import static diarsid.support.configuration.ConfigurationReading.parseConfigLines;
 import static diarsid.support.configuration.ConfigurationReading.readConfigEntriesAsLinesFrom;
@@ -45,6 +49,7 @@ public class Configuration {
     private static final Possible<Configuration> ACTUAL_CONFIGURATION;
     private static final Supplier<ConfigurationException> DEFAULT_UNCONFIGURED_EXCEPTION;
     private static final Supplier<ConfigurationException> ACTUAL_UNCONFIGURED_EXCEPTION;
+    private static final Set<String> CONFIG_OPTION_SEPARATORS;
     
     static {
         CONFIGURATION_LOCK = new Object();
@@ -54,6 +59,7 @@ public class Configuration {
                 new ConfigurationException("Default configuration not set!");
         ACTUAL_UNCONFIGURED_EXCEPTION = () -> 
                 new ConfigurationException("Actual configuration not set!");
+        CONFIG_OPTION_SEPARATORS = new HashSet<>(Arrays.asList(" ", ", ", ","));
     }
     
     // Object value may be String or List<String>
@@ -102,7 +108,7 @@ public class Configuration {
     }
     
     public static Configuration actualConfiguration() {
-        return ACTUAL_CONFIGURATION.orThrow(ACTUAL_UNCONFIGURED_EXCEPTION);
+        return ACTUAL_CONFIGURATION.orOther(DEFAULT_CONFIGURATION);
     }
     
     void logAll() {
@@ -153,7 +159,11 @@ public class Configuration {
     public boolean hasList(String option) {
         Object value = this.options.get(option);
         if ( nonNull(value) ) {
-            return value instanceof List;
+            if ( value instanceof List ) {
+                return true;
+            } else {
+                return findSeparatorIn((String) value).isPresent();
+            }            
         }
         return false;
     }
@@ -240,13 +250,26 @@ public class Configuration {
         return possibleButEmpty();
     }
     
+    private Optional<String> findSeparatorIn(String config) {
+        return CONFIG_OPTION_SEPARATORS
+                .stream()
+                .filter(separator -> config.contains(separator))
+                .findFirst();
+    }
+    
     public List<String> asList(String option) {
         if ( this.options.containsKey(option) ) {
             Object config = this.options.get(option);
             if ( isNull(config) ) {
                 return emptyList();
             } if ( config instanceof String ) {
-                return Arrays.asList((String) config);
+                String configString = (String) config;
+                Optional<String> separator = findSeparatorIn(configString);
+                if ( separator.isPresent() ) {
+                    return Arrays.asList(configString.split(separator.get()));
+                } else {
+                    return Arrays.asList(configString);
+                }                
             } else if ( config instanceof List ) {
                 return (List<String>) config;
             } else {
@@ -257,5 +280,12 @@ public class Configuration {
             throw new IllegalArgumentException(
                     format("There isn't configured '%s' option.", option));
         }
+    }
+    
+    public List<Integer> asInts(String option) {
+        return this.asList(option)
+                .stream()
+                .map(s -> parseInt(s))
+                .collect(toList());
     }
 }

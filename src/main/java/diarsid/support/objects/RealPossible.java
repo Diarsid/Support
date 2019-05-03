@@ -99,6 +99,12 @@ class RealPossible<T> implements Possible<T> {
     }
     
     @Override
+    public T extractOrThrow() {
+        this.checkValueNotNull();
+        return this.nullify();
+    }
+    
+    @Override
     public T orThrow(Supplier<? extends RuntimeException> exceptionCreator) {
         if ( isNull(this.t) ) {
             throw exceptionCreator.get();

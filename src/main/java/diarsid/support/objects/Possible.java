@@ -52,6 +52,8 @@ public interface Possible<T> {
     Possible<T> orDefault(T defaultT);
 
     T orThrow();
+    
+    T extractOrThrow();
 
     T orThrow(Supplier<? extends RuntimeException> exceptionCreator);
 

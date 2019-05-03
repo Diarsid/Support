@@ -17,52 +17,43 @@ import java.util.function.Supplier;
  */
 public final class Pool<T extends PooledReusable> {
     
-    private final Object lock;
+    private final Object monitor;
     private final Queue<T> queue;
     private final Supplier<T> tNewObjectSupplier;
     
     Pool(Supplier<T> newTSupplier) {
-        this.lock = new Object();
+        this.monitor = new Object();
         this.queue = new ArrayDeque<>();
         this.tNewObjectSupplier = newTSupplier;
     }
     
-    Object lock() {
-        return this.lock;
-    }
-    
     public T give() {
-        synchronized ( this.lock ) {
-            T t;
-            if ( this.queue.peek() == null ) {
+        T t;
+        synchronized ( this.monitor ) {            
+            if ( this.queue.isEmpty() ) {
                 t = this.tNewObjectSupplier.get();
+                t.setPool(this);
                 t.placedInPool();
             } else {
                 t = this.queue.poll();
-            }
-            t.takenFromPool();
-            return t;
+            }            
         }
+        t.takenFromPool();
+        return t;
     }
     
     public void takeBack(T t) {
-        t.clearForReuse();
-        synchronized ( this.lock ) {
-            t.placedInPool();
+        t.clearForReuseSynchronously();
+        t.placedInPool();
+        synchronized ( this.monitor ) {
             this.queue.offer(t);
         }
     }
     
     public void takeBackAll(Collection<T> ts) {
         for (T t : ts) {
-            t.clearForReuse();
-        }
-        synchronized ( this.lock ) {
-            for (T t : ts) {
-                t.placedInPool();
-                this.queue.offer(t);
-            }            
-        }        
+            this.takeBack(t);
+        } 
         ts.clear();
     }
 }

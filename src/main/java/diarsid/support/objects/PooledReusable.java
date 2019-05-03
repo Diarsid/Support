@@ -6,14 +6,12 @@
 package diarsid.support.objects;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
-import static diarsid.support.objects.Pools.createPool;
-import static diarsid.support.objects.Pools.giveBackToPool;
-import static diarsid.support.objects.Pools.nullablePoolOf;
+import static diarsid.support.objects.Pools.POOL_NOT_SET_EXCEPTION;
+import static diarsid.support.objects.Possibles.possibleButEmpty;
 
 /**
  *
@@ -22,29 +20,36 @@ import static diarsid.support.objects.Pools.nullablePoolOf;
 public abstract class PooledReusable implements AutoCloseable, StatefulClearable {
     
     private final UUID uuid;
-    private final Object poolLock;
+    private final Object monitor;
+    private final Possible<Pool<PooledReusable>> pool;
     private boolean isInPool;
     
     protected PooledReusable() {
         // empty constructor for creating new objects in pool
         this.uuid = randomUUID();
-        this.poolLock = nullablePoolOf(this.getClass()).lock();
+        this.monitor = new Object();
+        this.pool = possibleButEmpty();
         this.isInPool = false;
     }
     
-    protected static <T extends PooledReusable> void createPoolFor(
-            Class<T> type, Supplier<T> tSupplier) {
-        createPool(type, tSupplier);
-    }
-    
     protected abstract void clearForReuse();
+    
+    final void clearForReuseSynchronously() {
+        synchronized ( this.monitor ) {
+            this.clearForReuse();
+        }
+    }
     
     final Class getPooleableClass() {
         return this.getClass();
     }
     
-    final void placedInPool() {
-        synchronized ( this.poolLock ) {
+    final void setPool(Pool pool) {
+        this.pool.resetTo(pool);
+    }
+    
+    final void placedInPool() {        
+        synchronized ( this.monitor ) {
             if ( this.isInPool ) {
                 throw new IllegalStateException(format(
                         "Object %s@%s is already in pool!", 
@@ -56,7 +61,7 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
     }
     
     final void takenFromPool() {
-        synchronized ( this.poolLock ) {
+        synchronized ( this.monitor ) {
             if ( ! this.isInPool ) {
                 throw new IllegalStateException(format(
                         "Object %s@%s is already not in pool!", 
@@ -69,12 +74,12 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
 
     @Override
     public void close() {
-        giveBackToPool(this);
+        this.pool.orThrow(POOL_NOT_SET_EXCEPTION).takeBack(this);
     }
     
     @Override
     public void clear() {
-        this.clearForReuse();
+        this.clearForReuseSynchronously();
     }
     
     public final UUID identityUuid() {

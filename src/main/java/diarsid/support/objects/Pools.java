@@ -26,35 +26,52 @@ import static diarsid.support.log.Logging.logFor;
  */
 public class Pools {    
     
-    private static final Map<Class, Pool> POOLS_BY_POOLED_CLASS;
+    private static final Pools SINGLETON;
+    static final Supplier<? extends RuntimeException> POOL_NOT_SET_EXCEPTION;
+    
+    private final Map<Class, Pool> poolsByPooledClasses;
     
     static {
-        POOLS_BY_POOLED_CLASS = new HashMap<>();
+        SINGLETON = new Pools();
+        String poolNotSetExceptionMessage = format("%s is not set in %s instance!", 
+                                            Pool.class.getSimpleName(), 
+                                            PooledReusable.class.getSimpleName());
+        POOL_NOT_SET_EXCEPTION = () -> {
+            return new PoolException(poolNotSetExceptionMessage);
+        };
     }
     
-    private Pools() { }
+    public Pools() {
+        this.poolsByPooledClasses = new HashMap<>();
+    }
+    
+    public static Pools pools() {
+        return SINGLETON;
+    }
         
-    static <T extends PooledReusable> void createPool(Class<T> type, Supplier<T> tSupplier) {
-        synchronized ( POOLS_BY_POOLED_CLASS ) {
-            Pool<T> existedPool = POOLS_BY_POOLED_CLASS.get(type);
+    public <T extends PooledReusable> Pool<T> createPool(Class<T> type, Supplier<T> tSupplier) {
+        synchronized ( poolsByPooledClasses ) {
+            Pool<T> existedPool = poolsByPooledClasses.get(type);
             if ( existedPool == null ) {
                 Pool<T> newTPool = new Pool<>(tSupplier);
-                POOLS_BY_POOLED_CLASS.put(type, newTPool);
+                poolsByPooledClasses.put(type, newTPool);
                 logFor(Pools.class).info(format("Pool for %s created.", type.getCanonicalName()));
-            }       
+                existedPool = newTPool;
+            }
+            return existedPool;
         } 
     }
     
-    static <T extends PooledReusable> Pool<T> nullablePoolOf(Class<T> type) {
-        return POOLS_BY_POOLED_CLASS.get(type);
+    <T extends PooledReusable> Pool<T> nullablePoolOf(Class<T> type) {
+        return poolsByPooledClasses.get(type);
     }
     
-    public static <T extends PooledReusable> Optional<Pool<T>> poolOf(Class<T> type) {
-        return Optional.ofNullable(POOLS_BY_POOLED_CLASS.get(type));
+    public <T extends PooledReusable> Optional<Pool<T>> poolOf(Class<T> type) {
+        return Optional.ofNullable(poolsByPooledClasses.get(type));
     }
     
-    public static <T extends PooledReusable> T takeFromPool(Class<T> type) {
-        Pool<T> pool = POOLS_BY_POOLED_CLASS.get(type);
+    public <T extends PooledReusable> T takeFromPool(Class<T> type) {
+        Pool<T> pool = poolsByPooledClasses.get(type);
         T pooled;
         if ( pool == null ) {
             pooled = initializePoolAndGetInstanceOf(type);
@@ -64,7 +81,7 @@ public class Pools {
         return pooled;
     }
     
-    public static <T, P extends PooledReusable> T usePooledObjectUnsafe(
+    public <T, P extends PooledReusable> T usePooledObjectUnsafe(
             Class<P> type, Function<P, T> pooledObjectOperation) {
         P pooled = takeFromPool(type);
         try {            
@@ -77,7 +94,7 @@ public class Pools {
         }
     }
     
-    public static <P extends PooledReusable> void usePooledObject(
+    public <P extends PooledReusable> void usePooledObject(
             Class<P> type, Consumer<P> pooledObjectOperation) {
         P pooled = takeFromPool(type);
         try {            
@@ -89,7 +106,7 @@ public class Pools {
         }
     }
     
-    private static <T extends PooledReusable> T initializePoolAndGetInstanceOf(Class<T> type) {
+    private <T extends PooledReusable> T initializePoolAndGetInstanceOf(Class<T> type) {
         Constructor noArgsConstructor = stream(type.getDeclaredConstructors())
                 .filter(constructor -> constructor.getParameterCount() == 0)
                 .peek(constructor -> constructor.setAccessible(true))
@@ -106,21 +123,21 @@ public class Pools {
         }
     }
     
-    public static <T extends PooledReusable> void giveBackToPool(T pooleable) {
+    public <T extends PooledReusable> void giveBackToPool(T pooleable) {
         if ( pooleable == null ) {
             return;
         }
         
-        Pool<T> pool = POOLS_BY_POOLED_CLASS.get(pooleable.getPooleableClass());
+        Pool<T> pool = poolsByPooledClasses.get(pooleable.getPooleableClass());
         pool.takeBack(pooleable);
     }
     
-    public static <T extends PooledReusable> void giveBackAllToPoolAndClear(List<T> pooleables) {
+    public <T extends PooledReusable> void giveBackAllToPoolAndClear(List<T> pooleables) {
         if ( pooleables == null || pooleables.isEmpty() ) {
             return;
         }
         
-        Pool<T> pool = POOLS_BY_POOLED_CLASS.get(pooleables.get(0).getPooleableClass());
+        Pool<T> pool = poolsByPooledClasses.get(pooleables.get(0).getPooleableClass());
         pool.takeBackAll(pooleables);
     }
 }

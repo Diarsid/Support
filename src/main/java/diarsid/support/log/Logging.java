@@ -26,7 +26,7 @@ public class Logging {
     
     static {
         try {
-                if ( actualConfiguration().possibleBoolean("log").equalTo(true) ) {
+                if ( actualConfiguration().possibleBoolean("log").equalsTo(true) ) {
                 Map<Class, Logger> loggers = new HashMap<>();
                 LOGGER_ACTION = (object) -> {
                     Class clss;

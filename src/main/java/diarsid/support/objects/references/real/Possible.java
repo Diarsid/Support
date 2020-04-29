@@ -3,21 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diarsid.support.objects;
+package diarsid.support.objects.references.real;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import diarsid.support.objects.references.Reference;
 
 /**
  *
  * @author Diarsid
  */
-public interface Possible<T> {
-
-    boolean equalTo(T otherT);
+public interface Possible<T> extends Reference<T> {
 
     void ifNotPresent(Runnable runnable);
 
@@ -33,13 +32,7 @@ public interface Possible<T> {
 
     <R> Possible<R> map(Function<T, R> mapper);
 
-    boolean match(Predicate<T> predicate);
-
-    boolean notEqualTo(T otherT);
-
     boolean notEquals(Possible<T> possibleT);
-
-    boolean notMatch(Predicate<T> predicate);
 
     T nullify();
 
@@ -56,8 +49,6 @@ public interface Possible<T> {
     T extractOrThrow();
 
     T orThrow(Supplier<? extends RuntimeException> exceptionCreator);
-
-    T resetTo(T newT);
 
     T resetTo(Optional<T> optionalT);
 

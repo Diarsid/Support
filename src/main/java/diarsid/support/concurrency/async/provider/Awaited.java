@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diarsid.concurrency.async.provider;
+package diarsid.support.concurrency.async.provider;
 
 import java.util.Objects;
 import java.util.Optional;

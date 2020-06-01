@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diarsid.support.objects.references.real.Possible;
+import diarsid.support.objects.references.impl.Possible;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -34,9 +34,9 @@ import static java.util.stream.Collectors.toList;
 
 import static diarsid.support.configuration.ConfigurationReading.parseConfigLines;
 import static diarsid.support.configuration.ConfigurationReading.readConfigEntriesAsLinesFrom;
-import static diarsid.support.objects.references.real.Possibles.allPresent;
-import static diarsid.support.objects.references.real.Possibles.possibleButEmpty;
-import static diarsid.support.objects.references.real.Possibles.possibleWith;
+import static diarsid.support.objects.references.impl.References.allPresent;
+import static diarsid.support.objects.references.impl.References.possibleButEmpty;
+import static diarsid.support.objects.references.impl.References.possibleWith;
 
 /**
  *

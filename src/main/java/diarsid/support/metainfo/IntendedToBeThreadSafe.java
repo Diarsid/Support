@@ -3,14 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diarsid.support.objects.references.real;
+package diarsid.support.metainfo;
+
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
 
 /**
  *
  * @author Diarsid
  */
-public interface PossibleListenable<T> extends Possible<T>, ListenableRemovable<T> {
-    
-    Possible<T> asSimple();
+@Target(TYPE)
+public @interface IntendedToBeThreadSafe {
     
 }

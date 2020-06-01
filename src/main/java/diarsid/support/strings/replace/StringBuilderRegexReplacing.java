@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 
-import diarsid.metainfo.IntendedToBeThreadSafe;
+import diarsid.support.metainfo.IntendedToBeThreadSafe;
 
 import static diarsid.support.strings.replace.ReusableRegexMatchers.takeMatcherFor;
 import static diarsid.support.strings.replace.ReusableRegexMatchers.giveMatcherBack;

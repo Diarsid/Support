@@ -7,13 +7,13 @@ package diarsid.support.objects;
 
 import java.util.UUID;
 
-import diarsid.support.objects.references.real.Possible;
+import diarsid.support.objects.references.impl.Possible;
 
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
 import static diarsid.support.objects.Pools.POOL_NOT_SET_EXCEPTION;
-import static diarsid.support.objects.references.real.Possibles.possibleButEmpty;
+import static diarsid.support.objects.references.impl.References.possibleButEmpty;
 
 /**
  *

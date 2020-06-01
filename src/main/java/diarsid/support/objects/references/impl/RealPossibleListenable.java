@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diarsid.support.objects.references.real;
+package diarsid.support.objects.references.impl;
 
 import java.util.HashMap;
 import java.util.Map;

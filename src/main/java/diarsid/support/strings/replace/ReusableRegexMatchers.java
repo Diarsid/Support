@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import static diarsid.support.log.Logging.logFor;
 
-import diarsid.metainfo.IntendedToBeThreadSafe;
+import diarsid.support.metainfo.IntendedToBeThreadSafe;
 
 /**
  *

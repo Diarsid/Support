@@ -1,4 +1,4 @@
-package diarsid.support.objects.references.real;
+package diarsid.support.objects.references.impl;
 
 import diarsid.support.objects.references.Reference;
 

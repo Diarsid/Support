@@ -29,12 +29,12 @@ public class Pools {
     private static final Pools SINGLETON;
     static final Supplier<? extends RuntimeException> POOL_NOT_SET_EXCEPTION;
     
-    private final Map<Class, Pool> poolsByPooledClasses;
+    private final Map<Class, GuardedPool> poolsByPooledClasses;
     
     static {
         SINGLETON = new Pools();
         String poolNotSetExceptionMessage = format("%s is not set in %s instance!", 
-                                            Pool.class.getSimpleName(), 
+                                            GuardedPool.class.getSimpleName(),
                                             PooledReusable.class.getSimpleName());
         POOL_NOT_SET_EXCEPTION = () -> {
             return new PoolException(poolNotSetExceptionMessage);
@@ -49,34 +49,34 @@ public class Pools {
         return SINGLETON;
     }
         
-    public <T extends PooledReusable> Pool<T> createPool(Class<T> type, Supplier<T> tSupplier) {
+    public <T extends PooledReusable> GuardedPool<T> createPool(Class<T> type, Supplier<T> tSupplier) {
         synchronized ( poolsByPooledClasses ) {
-            Pool<T> existedPool = poolsByPooledClasses.get(type);
-            if ( existedPool == null ) {
-                Pool<T> newTPool = new Pool<>(tSupplier);
-                poolsByPooledClasses.put(type, newTPool);
+            GuardedPool<T> existedGuardedPool = poolsByPooledClasses.get(type);
+            if ( existedGuardedPool == null ) {
+                GuardedPool<T> newTGuardedPool = new GuardedPool<>(tSupplier);
+                poolsByPooledClasses.put(type, newTGuardedPool);
                 logFor(Pools.class).info(format("Pool for %s created.", type.getCanonicalName()));
-                existedPool = newTPool;
+                existedGuardedPool = newTGuardedPool;
             }
-            return existedPool;
+            return existedGuardedPool;
         } 
     }
     
-    <T extends PooledReusable> Pool<T> nullablePoolOf(Class<T> type) {
+    <T extends PooledReusable> GuardedPool<T> nullablePoolOf(Class<T> type) {
         return poolsByPooledClasses.get(type);
     }
     
-    public <T extends PooledReusable> Optional<Pool<T>> poolOf(Class<T> type) {
+    public <T extends PooledReusable> Optional<GuardedPool<T>> poolOf(Class<T> type) {
         return Optional.ofNullable(poolsByPooledClasses.get(type));
     }
     
     public <T extends PooledReusable> T takeFromPool(Class<T> type) {
-        Pool<T> pool = poolsByPooledClasses.get(type);
+        GuardedPool<T> guardedPool = poolsByPooledClasses.get(type);
         T pooled;
-        if ( pool == null ) {
+        if ( guardedPool == null ) {
             pooled = initializePoolAndGetInstanceOf(type);
         } else {
-            pooled = pool.give();
+            pooled = guardedPool.give();
         }        
         return pooled;
     }
@@ -128,8 +128,8 @@ public class Pools {
             return;
         }
         
-        Pool<T> pool = poolsByPooledClasses.get(pooleable.getPooleableClass());
-        pool.takeBack(pooleable);
+        GuardedPool<T> guardedPool = poolsByPooledClasses.get(pooleable.getPooleableClass());
+        guardedPool.takeBack(pooleable);
     }
     
     public <T extends PooledReusable> void giveBackAllToPoolAndClear(List<T> pooleables) {
@@ -137,7 +137,7 @@ public class Pools {
             return;
         }
         
-        Pool<T> pool = poolsByPooledClasses.get(pooleables.get(0).getPooleableClass());
-        pool.takeBackAll(pooleables);
+        GuardedPool<T> guardedPool = poolsByPooledClasses.get(pooleables.get(0).getPooleableClass());
+        guardedPool.takeBackAll(pooleables);
     }
 }

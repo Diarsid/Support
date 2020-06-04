@@ -23,7 +23,7 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
     
     private final UUID uuid;
     private final Object monitor;
-    private final Possible<Pool<PooledReusable>> pool;
+    private final Possible<GuardedPool<PooledReusable>> pool;
     private boolean isInPool;
     
     protected PooledReusable() {
@@ -46,8 +46,8 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
         return this.getClass();
     }
     
-    final void setPool(Pool pool) {
-        this.pool.resetTo(pool);
+    final void setPool(GuardedPool guardedPool) {
+        this.pool.resetTo(guardedPool);
     }
     
     final void placedInPool() {        

@@ -1,16 +1,22 @@
 package diarsid.support.objects.references.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import diarsid.support.objects.references.Listenable;
+import diarsid.support.objects.references.Listening;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 import static diarsid.support.objects.references.Reference.ValuePresence.PRESENT;
 
-class RealPresent<T> implements Present<T> {
+class RealPresent<T> implements Present<T>, RealBindable<T> {
 
+    private Map<Listenable<T>, Listening<T>> bindings;
     private final String name;
     protected T t;
 
@@ -86,6 +92,21 @@ class RealPresent<T> implements Present<T> {
     @Override
     public ValuePresence valuePresence() {
         return PRESENT;
+    }
+
+    @Override
+    public Map<Listenable<T>, Listening<T>> bindings() {
+        return this.bindings;
+    }
+
+    @Override
+    public void createBindingsMap() {
+        this.bindings = new HashMap<>();
+    }
+
+    @Override
+    public boolean isBindingsMapNull() {
+        return isNull(this.bindings);
     }
 
     @Override

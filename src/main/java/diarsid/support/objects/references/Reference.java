@@ -3,7 +3,7 @@ package diarsid.support.objects.references;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface Reference<T> {
+public interface Reference<T> extends Bindable<T> {
 
     enum ValuePresence {
         POSSIBLE,

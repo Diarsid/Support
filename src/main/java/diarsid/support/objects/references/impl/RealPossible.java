@@ -5,12 +5,17 @@
  */
 package diarsid.support.objects.references.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import diarsid.support.objects.references.Listenable;
+import diarsid.support.objects.references.Listening;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -21,8 +26,9 @@ import static diarsid.support.objects.references.Reference.ValuePresence.POSSIBL
  *
  * @author Diarsid
  */
-class RealPossible<T> implements Possible<T> {
-    
+class RealPossible<T> implements Possible<T>, RealBindable<T> {
+
+    private Map<Listenable<T>, Listening<T>> bindings;
     protected T t;
 
     protected RealPossible() {
@@ -233,5 +239,20 @@ class RealPossible<T> implements Possible<T> {
     @Override
     public boolean notEqualsTo(T otherT) {
         return nonNull(this.t) && ! this.t.equals(otherT);
+    }
+
+    @Override
+    public Map<Listenable<T>, Listening<T>> bindings() {
+        return this.bindings;
+    }
+
+    @Override
+    public void createBindingsMap() {
+        this.bindings = new HashMap<>();
+    }
+
+    @Override
+    public boolean isBindingsMapNull() {
+        return isNull(this.bindings);
     }
 }

@@ -18,7 +18,7 @@ public class References {
         return new RealPossible<>(optionalT.orElse(null));
     }
 
-    public static <T> PossibleListenable<T> listeneable(Possible<T> possibleT) {
+    public static <T> PossibleListenable<T> listenable(Possible<T> possibleT) {
         return new RealPossibleListenable<>(possibleT.or(null));
     }
 

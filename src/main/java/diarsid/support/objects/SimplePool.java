@@ -1,5 +1,7 @@
 package diarsid.support.objects;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
@@ -30,6 +32,18 @@ public class SimplePool<T> {
     }
 
     public void takeBack(T t) {
+        if ( t instanceof Closeable) {
+            try {
+                ((Closeable) t).close();
+            }
+            catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        else if ( t instanceof StatefulClearable ) {
+            ((StatefulClearable) t).clear();
+        }
+
         synchronized ( this.monitor ) {
             this.queue.offer(t);
         }

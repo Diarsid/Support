@@ -66,8 +66,8 @@ public class StringModel {
             if ( isNull(charPositions) ) {
                 charPositions = new ArrayList<>();
                 this.charsPositions.put(currChar, charPositions);                
-            } 
-            
+            }
+
             this.usedCharsPositionsLists.add(charPositions);
             
             if ( isPathSeparator(currChar) ) {
@@ -95,7 +95,7 @@ public class StringModel {
     private void clear() {
         this.separators.clear();
         this.repeatings.clear();
-        this.usedCharsPositionsLists.forEach(positions -> positions.clear());
+        this.usedCharsPositionsLists.forEach(List::clear);
         this.usedCharsPositionsLists.clear();
     }
     

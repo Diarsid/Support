@@ -16,7 +16,7 @@ import diarsid.support.objects.references.Reference;
  *
  * @author Diarsid
  */
-public interface Possible<T> extends Reference<T> {
+public interface Possible<T> extends Reference<T>, Supplier<T> {
 
     void ifNotPresent(Runnable runnable);
 
@@ -53,5 +53,13 @@ public interface Possible<T> extends Reference<T> {
     T resetTo(Optional<T> optionalT);
 
     T resetTo(Possible<T> possibleT);
-    
+
+    default T resetTo(Supplier<T> supplierT) {
+        return this.resetTo(supplierT.get());
+    }
+
+    @Override
+    default T get() {
+        return this.or(null);
+    }
 }

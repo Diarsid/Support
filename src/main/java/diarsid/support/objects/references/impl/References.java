@@ -10,12 +10,20 @@ public class References {
         return new RealPossible<>(null);
     }
 
+    public static <T> PossibleListenable<T> listenablePossibleButEmpty() {
+        return new RealPossibleListenable<>(null);
+    }
+
     public static <T> Possible<T> possibleWith(T t) {
         return new RealPossible<>(t);
     }
 
     public static <T> Possible<T> possibleOf(Optional<T> optionalT) {
         return new RealPossible<>(optionalT.orElse(null));
+    }
+
+    public static <T> PossibleListenable<T> listenablePossibleOf(Optional<T> optionalT) {
+        return new RealPossibleListenable<>(optionalT.orElse(null));
     }
 
     public static <T> PossibleListenable<T> listenable(Possible<T> possibleT) {
@@ -43,7 +51,7 @@ public class References {
         return new RealPresent<>(t, name);
     }
 
-    public static <T> PresentListenable<T> listenablePresent(T t, String name) {
+    public static <T> PresentListenable<T> listenablePresentOf(T t, String name) {
         return new RealPresentListenable<>(t, name);
     }
 

@@ -7,19 +7,19 @@ package diarsid.support.objects;
 
 import java.util.UUID;
 
-import diarsid.support.objects.references.impl.Possible;
+import diarsid.support.objects.references.Possible;
 
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 
 import static diarsid.support.objects.Pools.POOL_NOT_SET_EXCEPTION;
-import static diarsid.support.objects.references.impl.References.possibleButEmpty;
+import static diarsid.support.objects.references.References.simplePossibleButEmpty;
 
 /**
  *
  * @author Diarsid
  */
-public abstract class PooledReusable implements AutoCloseable, StatefulClearable {
+public abstract class PooledReusable implements AutoCloseable, StatefulClearable, Initializable {
     
     private final UUID uuid;
     private final Object monitor;
@@ -30,11 +30,16 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
         // empty constructor for creating new objects in pool
         this.uuid = randomUUID();
         this.monitor = new Object();
-        this.pool = possibleButEmpty();
+        this.pool = simplePossibleButEmpty();
         this.isInPool = false;
     }
     
     protected abstract void clearForReuse();
+
+    @Override
+    public void init() {
+        // to be overridden if needed
+    }
     
     final void clearForReuseSynchronously() {
         synchronized ( this.monitor ) {
@@ -71,16 +76,17 @@ public abstract class PooledReusable implements AutoCloseable, StatefulClearable
                         this.hashCode()));
             }
             this.isInPool = false;
+            this.init();
         }
     }
 
     @Override
-    public void close() {
+    public final void close() {
         this.pool.orThrow(POOL_NOT_SET_EXCEPTION).takeBack(this);
     }
     
     @Override
-    public void clear() {
+    public final void clear() {
         this.clearForReuseSynchronously();
     }
     

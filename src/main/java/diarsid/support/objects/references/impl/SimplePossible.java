@@ -5,8 +5,6 @@
  */
 package diarsid.support.objects.references.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -14,28 +12,27 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import diarsid.support.objects.references.Listenable;
-import diarsid.support.objects.references.Listening;
+import diarsid.support.objects.references.Possible;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import static diarsid.support.objects.references.Reference.Type.VALUE;
 import static diarsid.support.objects.references.Reference.ValuePresence.POSSIBLE;
 
 /**
  *
  * @author Diarsid
  */
-class RealPossible<T> implements Possible<T>, RealBindable<T> {
+public class SimplePossible<T> implements Possible<T> {
 
-    private Map<Listenable<T>, Listening<T>> bindings;
     protected T t;
 
-    protected RealPossible() {
+    public SimplePossible() {
         this.t = null;
     }
-    
-    RealPossible(T t) {
+
+    public SimplePossible(T t) {
         this.t = t;
     }
     
@@ -46,7 +43,7 @@ class RealPossible<T> implements Possible<T>, RealBindable<T> {
     }
     
     @Override
-    public RealPossible<T> orDefault(T defaultT) {
+    public SimplePossible<T> orDefault(T defaultT) {
         if ( isNull(this.t) ) {
             this.internalSet(defaultT);
         }
@@ -94,11 +91,11 @@ class RealPossible<T> implements Possible<T>, RealBindable<T> {
     }
     
     @Override
-    public <R> RealPossible<R> map(Function<T, R> mapper) {
+    public <R> SimplePossible<R> map(Function<T, R> mapper) {
         if ( this.isPresent() ) {
-            return new RealPossible<>(mapper.apply(this.t));
+            return new SimplePossible<>(mapper.apply(this.t));
         } else {
-            return new RealPossible<>();
+            return new SimplePossible<>();
         }        
     }
     
@@ -176,6 +173,11 @@ class RealPossible<T> implements Possible<T>, RealBindable<T> {
     }
 
     @Override
+    public Type type() {
+        return VALUE;
+    }
+
+    @Override
     public T resetTo(Optional<T> optionalT) {
         return this.resetTo(optionalT.orElse(null));
     }
@@ -215,8 +217,8 @@ class RealPossible<T> implements Possible<T>, RealBindable<T> {
         return 
                 nonNull(this.t) && 
                 nonNull(o) && 
-                o instanceof RealPossible && 
-                this.t.equals(((RealPossible) o).t);
+                o instanceof SimplePossible &&
+                this.t.equals(((SimplePossible) o).t);
     }
 
     @Override
@@ -242,17 +244,7 @@ class RealPossible<T> implements Possible<T>, RealBindable<T> {
     }
 
     @Override
-    public Map<Listenable<T>, Listening<T>> bindings() {
-        return this.bindings;
-    }
-
-    @Override
-    public void createBindingsMap() {
-        this.bindings = new HashMap<>();
-    }
-
-    @Override
-    public boolean isBindingsMapNull() {
-        return isNull(this.bindings);
+    public String toString() {
+        return "SimplePossible{" + t + '}';
     }
 }

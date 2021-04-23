@@ -13,7 +13,7 @@ class StringBuilderStringReplacing implements SingleReplacing {
     private final int stringToReplaceLength;
     private final int replacementLength;
 
-    public StringBuilderStringReplacing(String stringToReplace, String replacement) {
+    StringBuilderStringReplacing(String stringToReplace, String replacement) {
         this.stringToReplace = stringToReplace;
         this.replacement = replacement;
         this.stringToReplaceLength = this.stringToReplace.length();

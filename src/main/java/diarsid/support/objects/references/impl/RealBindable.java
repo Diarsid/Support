@@ -5,6 +5,8 @@ import java.util.Map;
 import diarsid.support.objects.references.Bindable;
 import diarsid.support.objects.references.Listenable;
 import diarsid.support.objects.references.Listening;
+import diarsid.support.objects.references.Possible;
+import diarsid.support.objects.references.Present;
 import diarsid.support.objects.references.Reference;
 
 import static java.lang.String.format;
@@ -14,16 +16,8 @@ interface RealBindable<T> extends Bindable<T>, Reference<T> {
 
     Map<Listenable<T>, Listening<T>> bindings();
 
-    void createBindingsMap();
-
-    boolean isBindingsMapNull();
-
     @SuppressWarnings("unchecked")
     default void bindTo(Listenable<T> listenable) {
-        if ( this.isBindingsMapNull() ) {
-            this.createBindingsMap();
-        }
-
         Map<Listenable<T>, Listening<T>> bindings = this.bindings();
 
         if ( bindings.containsKey(listenable) ) {
@@ -34,11 +28,11 @@ interface RealBindable<T> extends Bindable<T>, Reference<T> {
         bindings.put(listenable, listening);
 
         T valueOnBind;
-        if ( listenable instanceof Present ) {
+        if ( listenable instanceof Present) {
             Present<T> present = (Present<T>) listenable;
             valueOnBind = present.get();
         }
-        else if ( listenable instanceof Possible ) {
+        else if ( listenable instanceof Possible) {
             Possible<T> possible = (Possible<T>) listenable;
             valueOnBind = possible.or(null);
         }
@@ -58,10 +52,6 @@ interface RealBindable<T> extends Bindable<T>, Reference<T> {
 
     @Override
     default void unbindFrom(Listenable<T> listenable) {
-        if ( this.isBindingsMapNull() ) {
-            return;
-        }
-
         Map<Listenable<T>, Listening<T>> bindings = this.bindings();
 
         Listening<T> listening = bindings.remove(listenable);
@@ -72,10 +62,6 @@ interface RealBindable<T> extends Bindable<T>, Reference<T> {
 
     @Override
     default void unbindAll() {
-        if ( this.isBindingsMapNull() ) {
-            return;
-        }
-
         this.bindings().values().forEach(this::cancelListening);
         this.bindings().clear();
     }

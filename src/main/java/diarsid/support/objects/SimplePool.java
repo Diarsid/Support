@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SimplePool<T> {
@@ -12,11 +13,23 @@ public class SimplePool<T> {
     private final Object monitor;
     private final Queue<T> queue;
     private final Supplier<T> tNewObjectSupplier;
+    private final Consumer<T> tInitializer;
+    private final boolean hasInitializer;
 
     public SimplePool(Supplier<T> newTSupplier) {
         this.monitor = new Object();
         this.queue = new ArrayDeque<>();
         this.tNewObjectSupplier = newTSupplier;
+        this.tInitializer = null;
+        this.hasInitializer = false;
+    }
+
+    public SimplePool(Supplier<T> newTSupplier, Consumer<T> tInitializer) {
+        this.monitor = new Object();
+        this.queue = new ArrayDeque<>();
+        this.tNewObjectSupplier = newTSupplier;
+        this.tInitializer = tInitializer;
+        this.hasInitializer = true;
     }
 
     public T give() {
@@ -26,6 +39,14 @@ public class SimplePool<T> {
                 t = this.tNewObjectSupplier.get();
             } else {
                 t = this.queue.poll();
+            }
+
+            if ( t instanceof Initializable ) {
+                ((Initializable) t).init();
+            }
+
+            if ( this.hasInitializer ) {
+                this.tInitializer.accept(t);
             }
         }
         return t;

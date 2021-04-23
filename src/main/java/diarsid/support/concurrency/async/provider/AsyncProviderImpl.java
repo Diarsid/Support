@@ -16,6 +16,7 @@ import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROV
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_FAILED;
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_RUNNING;
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_STOPPED;
+import static diarsid.support.concurrency.threads.ThreadsUtil.sleepSafely;
 
 /**
  *
@@ -238,9 +239,5 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
             Awaited<String> awaitedString = asyncProvider.stop();
             System.out.println("stopping thread: " + awaitedString);
         });
-    }
-
-    static void sleepSafely(int ms) {
-        try { Thread.sleep(ms); } catch (InterruptedException e) {}
     }
 }

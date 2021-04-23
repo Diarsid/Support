@@ -8,6 +8,8 @@ package diarsid.support.strings.replace;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 /**
  *
  * @author Diarsid
@@ -31,6 +33,16 @@ public class Replace {
     
     public Replace regexToString(String regexToReplace, String replacement) {
         this.replacings.add(new StringBuilderRegexReplacing(regexToReplace, replacement));
+        return this;
+    }
+
+    public Replace stringToStringFirstFrom(ReplacePair... replacePairs) {
+        this.replacings.add(new StringBuilderStringReplacingManyPairs(asList(replacePairs)));
+        return this;
+    }
+
+    public Replace regexToStringFirstFrom(ReplacePair... replacePairs) {
+        this.replacings.add(new StringBuilderRegexReplacingManyPairs(asList(replacePairs)));
         return this;
     }
     

@@ -7,6 +7,13 @@
 package diarsid.support.objects;
 
 import java.util.Objects;
+import java.util.Optional;
+
+import diarsid.support.objects.references.Possible;
+import diarsid.support.objects.references.impl.SimplePossible;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  *
@@ -28,6 +35,38 @@ public class Pair <K, V> {
 
     public V second() {
         return this.v;
+    }
+
+    public boolean isFirstEmpty() {
+        return isNull(this.k);
+    }
+
+    public boolean isSecondEmpty() {
+        return isNull(this.v);
+    }
+
+    public boolean isFirstPresent() {
+        return nonNull(this.k);
+    }
+
+    public boolean isSecondPresent() {
+        return nonNull(this.v);
+    }
+
+    public Optional<K> optionalFirst() {
+        return Optional.ofNullable(this.k);
+    }
+
+    public Optional<V> optionalSecond() {
+        return Optional.ofNullable(this.v);
+    }
+
+    public Possible<K> possibleFirst() {
+        return new SimplePossible<>(this.k);
+    }
+
+    public Possible<V> possibleSecond() {
+        return new SimplePossible<>(this.v);
     }
 
     @Override

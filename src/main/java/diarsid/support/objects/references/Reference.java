@@ -1,13 +1,19 @@
 package diarsid.support.objects.references;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface Reference<T> extends Bindable<T> {
+public interface Reference<T> {
 
     enum ValuePresence {
         POSSIBLE,
         PRESENT
+    }
+
+    enum Type {
+        VALUE,
+        PROPERTY
     }
 
     boolean equalsTo(T otherT);
@@ -23,4 +29,6 @@ public interface Reference<T> extends Bindable<T> {
     T modify(Function<T, T> oldToNew);
 
     Reference.ValuePresence valuePresence();
+
+    Reference.Type type();
 }

@@ -17,10 +17,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import diarsid.support.objects.references.Possible;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import diarsid.support.objects.references.impl.Possible;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -34,9 +33,9 @@ import static java.util.stream.Collectors.toList;
 
 import static diarsid.support.configuration.ConfigurationReading.parseConfigLines;
 import static diarsid.support.configuration.ConfigurationReading.readConfigEntriesAsLinesFrom;
-import static diarsid.support.objects.references.impl.References.allPresent;
-import static diarsid.support.objects.references.impl.References.possibleButEmpty;
-import static diarsid.support.objects.references.impl.References.possibleWith;
+import static diarsid.support.objects.references.References.allPresent;
+import static diarsid.support.objects.references.References.simplePossibleButEmpty;
+import static diarsid.support.objects.references.References.simplePossibleWith;
 
 /**
  *
@@ -53,8 +52,8 @@ public class Configuration {
     
     static {
         CONFIGURATION_LOCK = new Object();
-        DEFAULT_CONFIGURATION = possibleButEmpty();
-        ACTUAL_CONFIGURATION = possibleButEmpty();
+        DEFAULT_CONFIGURATION = simplePossibleButEmpty();
+        ACTUAL_CONFIGURATION = simplePossibleButEmpty();
         DEFAULT_UNCONFIGURED_EXCEPTION = () -> 
                 new ConfigurationException("Default configuration not set!");
         ACTUAL_UNCONFIGURED_EXCEPTION = () -> 
@@ -244,10 +243,10 @@ public class Configuration {
         if ( this.options.containsKey(option) ) {
             Object config = this.options.get(option);
             if ( nonNull(config) && config instanceof String ) {
-                return possibleWith(parseBoolean((String) config));
+                return simplePossibleWith(parseBoolean((String) config));
             }
         } 
-        return possibleButEmpty();
+        return simplePossibleButEmpty();
     }
     
     private Optional<String> findSeparatorIn(String config) {

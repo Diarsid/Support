@@ -3,27 +3,80 @@ package diarsid.support.objects.references.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import diarsid.support.objects.references.Listenable;
 import diarsid.support.objects.references.Listening;
+import diarsid.support.objects.references.Present;
+import diarsid.support.objects.references.PresentProperty;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
+import static diarsid.support.objects.references.Reference.Type.PROPERTY;
 import static diarsid.support.objects.references.Reference.ValuePresence.PRESENT;
 
-class RealPresent<T> implements Present<T>, RealBindable<T> {
+public class RealPresentProperty<T> implements PresentProperty<T>, RealBindable<T>, ListenableRemovable<T>  {
 
-    private Map<Listenable<T>, Listening<T>> bindings;
     private final String name;
     protected T t;
+    private final HashMap<RealListening<T>, BiConsumer<T, T>> listeners;
+    private final Map<Listenable<T>, Listening<T>> bindings;
 
-    RealPresent(T t, String name) {
+    public RealPresentProperty(T t, String name) {
         this.name = name;
         checkRequirements(t);
         this.t = t;
+        this.listeners = new HashMap<>();
+        this.bindings = new HashMap<>();
+    }
+
+    protected T internalSet(T newT) {
+        checkRequirements(newT);
+        T oldT = this.t;
+        this.t = newT;
+
+        if ( ! this.listeners.isEmpty() ) {
+            this.listeners
+                    .entrySet()
+                    .forEach(pair -> {
+                        if ( pair.getKey().isListening() ) {
+                            try {
+                                pair.getValue().accept(oldT, newT);
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+        }
+        return oldT;
+    }
+
+    @Override
+    public Listening<T> listen(BiConsumer<T, T> listener) {
+        RealListening<T> listening = new RealListening<>(this);
+        this.listeners.put(listening, listener);
+        return listening;
+    }
+
+    @Override
+    public void clearListeners() {
+        this.listeners.keySet().forEach(RealListening::cancelInternally);
+    }
+
+    @Override
+    public boolean remove(Listening<T> listening) {
+        if (listening instanceof RealListening) {
+            BiConsumer<T, T> removed = this.listeners.remove(listening);
+            return nonNull(removed);
+        }
+        else {
+            return false;
+        }
     }
 
     private final void checkRequirements(T offeredT) {
@@ -33,13 +86,6 @@ class RealPresent<T> implements Present<T>, RealBindable<T> {
                     t.getClass().getSimpleName(),
                     this.name));
         }
-    }
-
-    protected T internalSet(T offeredT) {
-        checkRequirements(offeredT);
-        T oldT = this.t;
-        this.t = offeredT;
-        return oldT;
     }
 
     @Override
@@ -95,18 +141,13 @@ class RealPresent<T> implements Present<T>, RealBindable<T> {
     }
 
     @Override
+    public Type type() {
+        return PROPERTY;
+    }
+
+    @Override
     public Map<Listenable<T>, Listening<T>> bindings() {
         return this.bindings;
-    }
-
-    @Override
-    public void createBindingsMap() {
-        this.bindings = new HashMap<>();
-    }
-
-    @Override
-    public boolean isBindingsMapNull() {
-        return isNull(this.bindings);
     }
 
     @Override
@@ -120,8 +161,8 @@ class RealPresent<T> implements Present<T>, RealBindable<T> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RealPresent)) return false;
-        RealPresent<?> that = (RealPresent<?>) o;
+        if (!(o instanceof RealPresentProperty)) return false;
+        RealPresentProperty<?> that = (RealPresentProperty<?>) o;
         return name.equals(that.name) &&
                 t.equals(that.t);
     }

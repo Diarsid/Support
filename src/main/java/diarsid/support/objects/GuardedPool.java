@@ -8,6 +8,7 @@ package diarsid.support.objects;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 
@@ -20,11 +21,22 @@ public final class GuardedPool<T extends PooledReusable> {
     private final Object monitor;
     private final Queue<T> queue;
     private final Supplier<T> tNewObjectSupplier;
+    private final Consumer<T> tInitializer;
+    private final boolean hasInitializer;
     
-    GuardedPool(Supplier<T> newTSupplier) {
+    public GuardedPool(Supplier<T> newTSupplier) {
         this.monitor = new Object();
         this.queue = new ArrayDeque<>();
         this.tNewObjectSupplier = newTSupplier;
+        this.tInitializer = null;
+        this.hasInitializer = false;
+    }
+    public GuardedPool(Supplier<T> newTSupplier, Consumer<T> tInitializer) {
+        this.monitor = new Object();
+        this.queue = new ArrayDeque<>();
+        this.tNewObjectSupplier = newTSupplier;
+        this.tInitializer = tInitializer;
+        this.hasInitializer = true;
     }
     
     public T give() {
@@ -39,6 +51,9 @@ public final class GuardedPool<T extends PooledReusable> {
             }            
         }
         t.takenFromPool();
+        if ( this.hasInitializer ) {
+            this.tInitializer.accept(t);
+        }
         return t;
     }
     

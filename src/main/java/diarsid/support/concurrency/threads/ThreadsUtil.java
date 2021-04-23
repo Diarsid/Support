@@ -19,4 +19,8 @@ public class ThreadsUtil {
             }
         } while (! threads.isTerminated() );
     }
+
+    public static void sleepSafely(int ms) {
+        try { Thread.sleep(ms); } catch (InterruptedException e) {}
+    }
 }

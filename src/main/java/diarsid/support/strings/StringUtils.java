@@ -11,12 +11,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import diarsid.support.exceptions.UnsupportedLogicException;
 import diarsid.support.strings.replace.Replace;
 
+import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -95,6 +99,21 @@ public class StringUtils {
     public static String normalizeSpaces(String target) {
         return target.replaceAll("\\s+", " ").trim();
     }
+
+    public static String normalizeDashes(String target) {
+        return target.replaceAll("[-]+", "-");
+    }
+
+    public static String normalizeUnderscores(String target) {
+        String result = target.replaceAll("[_]+", "_");
+        if ( result.endsWith("_") ) {
+            result = result.substring(0, result.length() - 1);
+        }
+        if ( result.startsWith("_") ) {
+            result = result.substring(1);
+        }
+        return result;
+    }
     
     public static String removeWildcards(String target) {
         return target.replaceAll("-+", "");
@@ -147,9 +166,11 @@ public class StringUtils {
                 c == ' ' || 
                 c == '_' || 
                 c == '-' ||
+                c == '#' ||
                 c == '&' || 
-                c == '*' || 
-                c == '?' || 
+                c == '*' ||
+                c == '$' ||
+                c == '?' ||
                 c == '>' || 
                 c == '<' || 
                 c == '=' || 
@@ -178,6 +199,24 @@ public class StringUtils {
     public static boolean containsWordsSeparator(String target) {
         for (int i = 0; i < target.length(); i++) {
             if ( isWordsSeparator(target.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean containsPathSeparator(String target) {
+        for (int i = 0; i < target.length(); i++) {
+            if ( isPathSeparator(target.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean containsTextSeparator(String target) {
+        for (int i = 0; i < target.length(); i++) {
+            if ( isTextSeparator(target.charAt(i))) {
                 return true;
             }
         }
@@ -276,6 +315,351 @@ public class StringUtils {
         }
         
         return matches;
+    }
+
+    public static List<String> splitByTextSeparators(String target) {
+        List<String> words = new ArrayList<>();
+        int wordBeganIndex = -1;
+        boolean wordContinue = false;
+        char current;
+        String word;
+        int last = target.length() - 1;
+
+        for (int i = 0; i < target.length(); i++) {
+            current = target.charAt(i);
+
+            if ( isTextSeparator(current) ) {
+                if ( wordContinue ) {
+                    word = target.substring(wordBeganIndex, i);
+                    words.add(word);
+                    wordContinue = false;
+                }
+            }
+            else {
+                if ( wordContinue ) {
+                    if ( i == last ) {
+                        word = target.substring(wordBeganIndex);
+                        words.add(word);
+                    }
+                }
+                else {
+                    wordContinue = true;
+                    wordBeganIndex = i;
+                }
+            }
+        }
+
+        return words;
+    }
+
+    public static List<String> splitByAnySeparators(String target) {
+        List<String> words = new ArrayList<>();
+        int wordBeganIndex = -1;
+        boolean wordContinue = false;
+        char current;
+        String word;
+        int last = target.length() - 1;
+
+        for (int i = 0; i < target.length(); i++) {
+            current = target.charAt(i);
+
+            if ( isTextSeparator(current) || isPathSeparator(current) ) {
+                if ( wordContinue ) {
+                    word = target.substring(wordBeganIndex, i);
+                    words.add(word);
+                    wordContinue = false;
+                }
+            }
+            else {
+                if ( wordContinue ) {
+                    if ( i == last ) {
+                        word = target.substring(wordBeganIndex);
+                        words.add(word);
+                    }
+                }
+                else {
+                    if ( i == last ) {
+                        word = target.substring(i);
+                        words.add(word);
+                    } else {
+                        wordContinue = true;
+                        wordBeganIndex = i;
+                    }
+                }
+            }
+        }
+
+        return words;
+    }
+
+    public static int firstTextSeparator(String target) {
+        if ( isNull(target) ) {
+            throw new IllegalArgumentException();
+        }
+
+        if ( target.isEmpty() ) {
+            return -1;
+        }
+
+        for (int i = 0; i < target.length(); i++) {
+            if ( isTextSeparator(target.charAt(i)) ) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static int firstTextSeparator(String target, int from) {
+        if ( isNull(target) ) {
+            throw new IllegalArgumentException();
+        }
+
+        if ( target.isEmpty() ) {
+            return -1;
+        }
+
+        if ( from >= target.length() ) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int i = 0; i < target.length(); i++) {
+            if ( isTextSeparator(target.charAt(i)) ) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static String stringify(Object obj) {
+        if ( obj instanceof Enum ) {
+            return ((Enum) obj).name();
+        } else if ( obj instanceof byte[] || obj instanceof Byte[] ) {
+            return format("bytes:%s", ((byte[]) obj).length );
+        } else if ( obj instanceof Collection ) {
+            return stringifyAsCollection(obj);
+        } else if ( obj.getClass().isArray() ) {
+            return stringifyAsArray(obj);
+        } else {
+            return obj.toString();
+        }
+    }
+
+    public static String stringifyAsCollection(Object obj) {
+        return ((Collection<Object>) obj)
+                .stream()
+                .map(StringUtils::stringify)
+                .collect(Collectors.joining(", "));
+    }
+
+    public static String stringifyAsArray(Object obj) {
+        return stream(((Object[]) obj))
+                .map(StringUtils::stringify)
+                .collect(Collectors.joining(", "));
+    }
+
+    public static String replaceFirst(String what, String where, String replace) {
+        return replaceFirst(what, where, replace, 0);
+    }
+
+    public static String replaceFirst(String what, String where, String replace, int fromIncl) {
+        int i = where.indexOf(what, fromIncl);
+
+        if ( i < 0 ) {
+            return where;
+        }
+
+        StringBuilder whereBuffer = new StringBuilder(where);
+        whereBuffer.replace(i, i + what.length(), replace);
+
+        return whereBuffer.toString();
+    }
+
+    public static String replaceAllWith(String what, String where, List<String> replaces, boolean checkSizeEquality) {
+        return replaceAllWith(what, new StringBuilder(where), replaces, checkSizeEquality);
+    }
+
+    public static String replaceAllWith(
+            String what, StringBuilder where, List<String> replaces, boolean checkSizeEquality) {
+        int i = 0;
+        int iReplace = 0;
+        String replace;
+        while ( true ) {
+            i = where.indexOf(what, i + 1);
+
+            if ( i < 0 ) {
+                if ( checkSizeEquality && (iReplace != replaces.size()) ) {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            }
+
+            replace = replaces.get(iReplace);
+            iReplace++;
+
+            where.replace(i, i + what.length(), replace);
+        }
+
+        return where.toString();
+    }
+
+    public static String replaceAllWith(
+            String what, StringBuilder where, int fromIndex, List<String> replaces, boolean checkSizeEquality) {
+        int i = fromIndex;
+        int iReplace = 0;
+        String replace;
+        while ( true ) {
+            i = where.indexOf(what, i + 1);
+
+            if ( i < 0 ) {
+                if ( checkSizeEquality && (iReplace != replaces.size()) ) {
+                    throw new IllegalArgumentException();
+                }
+                break;
+            }
+
+            replace = replaces.get(iReplace);
+            iReplace++;
+
+            where.replace(i, i + what.length(), replace);
+            i = i + replace.length();
+        }
+
+        return where.toString();
+    }
+
+    public static List<String> splitCamelCase(String string, boolean allowOneCharSeparation) {
+        string = string.trim().strip();
+
+        if ( string.isBlank() ) {
+            return emptyList();
+        }
+
+        if ( string.length() == 1 ) {
+            return List.of(string);
+        }
+
+        List<String> results = new ArrayList<>();
+
+        final int WORD_NOT_FOUND = -1;
+
+        char c;
+        int current;
+        int previous;
+        int last = string.length() - 1;
+        boolean currentIsUpper;
+        boolean currentIsDigit;
+        boolean previousIsUpper = false;
+        boolean previousIsDigit = false;
+        int wordStartIncl = 0;
+        int wordEndExcl;
+        String substring;
+
+        for (int i = 0; i < string.length(); i++) {
+            wordEndExcl = WORD_NOT_FOUND;
+            current = i;
+            c = string.charAt(current);
+            currentIsUpper = Character.isUpperCase(c);
+
+            if ( currentIsUpper ) {
+                currentIsDigit = false;
+            } else {
+                currentIsDigit = Character.isDigit(c);
+            }
+
+            if (i > 0) {
+                if ( current == last ) {
+                    wordEndExcl = current + 1;
+                }
+                else {
+                    if ( currentIsUpper ) {
+                        if ( ! previousIsUpper ) {
+                            wordEndExcl = current;
+                        }
+                    }
+                    else {
+                        if ( currentIsDigit ) {
+                            if ( ! previousIsDigit ) {
+                                wordEndExcl = current;
+                            }
+                        }
+                        else {
+                            previous = current - 1;
+                            if ( previousIsUpper ) {
+                                if ( wordStartIncl < previous ) {
+                                    wordEndExcl = previous;
+                                }
+                            }
+                            else if ( previousIsDigit ) {
+                                if (wordStartIncl < previous) {
+                                    wordEndExcl = previous;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ( wordEndExcl > WORD_NOT_FOUND ) {
+                if ( allowOneCharSeparation ) {
+                    substring = string.substring(wordStartIncl, wordEndExcl);
+                    results.add(substring);
+                    wordStartIncl = wordEndExcl;
+                }
+                else if (wordEndExcl > wordStartIncl + 1) {
+                    substring = string.substring(wordStartIncl, wordEndExcl);
+                    results.add(substring);
+                    wordStartIncl = wordEndExcl;
+                }
+            }
+
+            previousIsUpper = currentIsUpper;
+            previousIsDigit = currentIsDigit;
+        }
+
+        return results;
+    }
+
+    public static String removeSpecialCharsFrom(String target) {
+        StringBuilder sb = new StringBuilder();
+        char c;
+        for (int i = 0; i < target.length(); i++) {
+            c = target.charAt(i);
+            if ( isLanguageChar(c) ) {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static String removeSpecialCharsFrom(String target, char... excluding) {
+        StringBuilder sb = new StringBuilder();
+        char c;
+        charsLoop: for (int i = 0; i < target.length(); i++) {
+            c = target.charAt(i);
+            for ( char cExcl : excluding ) {
+                if ( c == cExcl ) {
+                    sb.append(c);
+                    continue charsLoop;
+                }
+            }
+            if ( isLanguageChar(c) ) {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static boolean isLanguageChar(char c) {
+        return Character.isAlphabetic(c) || Character.isDigit(c);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(removeSpecialCharsFrom(
+                "tolkien's a~b z`s 1234^g (a) [b] {c} Її ъ ش \"x\" <j> ", ' '));
     }
     
 }

@@ -15,6 +15,11 @@ import diarsid.test.BaseTest;
 
 import static java.util.Arrays.asList;
 
+import static diarsid.support.strings.StringUtils.normalizeUnderscores;
+import static diarsid.support.strings.StringUtils.splitByAnySeparators;
+import static diarsid.support.strings.StringUtils.splitByTextSeparators;
+import static diarsid.support.strings.StringUtils.splitCamelCase;
+import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -83,5 +88,133 @@ public class StringUtilsTest extends BaseTest {
         
         int matches = countCharMatchesIn(first, 2, 5, second, 2, 5);
         assertThat(matches, equalTo(3));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest1() {
+        String phrase = "word__one_*&_two_%-and_#third";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(5));
+        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.get(1), equalTo("one"));
+        assertThat(words.get(2), equalTo("two"));
+        assertThat(words.get(3), equalTo("and"));
+        assertThat(words.get(4), equalTo("third"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest2() {
+        String phrase = "__word__one_*&_two_%-and_#third";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(5));
+        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.get(1), equalTo("one"));
+        assertThat(words.get(2), equalTo("two"));
+        assertThat(words.get(3), equalTo("and"));
+        assertThat(words.get(4), equalTo("third"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest3() {
+        String phrase = "word__one_*&_two_%-and_#third__";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(5));
+        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.get(1), equalTo("one"));
+        assertThat(words.get(2), equalTo("two"));
+        assertThat(words.get(3), equalTo("and"));
+        assertThat(words.get(4), equalTo("third"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest4() {
+        String phrase = "word";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(1));
+        assertThat(words.get(0), equalTo("word"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest5() {
+        String phrase = "word__";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(1));
+        assertThat(words.get(0), equalTo("word"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest6() {
+        String phrase = "____word__";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(1));
+        assertThat(words.get(0), equalTo("word"));
+    }
+
+    @Test
+    public void splitByTextSeparatorsTest7() {
+        String phrase = "__";
+
+        List<String> words = splitByTextSeparators(phrase);
+        assertThat(words.size(), equalTo(0));
+    }
+
+    @Test
+    public void splitByAnySeparatorsTest() {
+        String phrase = "John D";
+
+        List<String> words = splitByAnySeparators(phrase);
+        assertThat(words.size(), equalTo(2));
+    }
+
+    @Test
+    public void splitByAnySeparatorsTest2() {
+        String phrase = "John Dd";
+
+        List<String> words = splitByAnySeparators(phrase);
+        assertThat(words.size(), equalTo(2));
+    }
+
+    @Test
+    public void splitCamelCaseTest_allowSingleCharSeparation() {
+        boolean allowSingleCharSeparation = true;
+        String camelCaseWithNumbers = "2ABS45CamelXYZ123CaseSString";
+        List<String> words = splitCamelCase(camelCaseWithNumbers, allowSingleCharSeparation);
+
+        List<String> expected = List.of("2", "ABS", "45", "Camel", "XYZ", "123", "Case", "S", "String");
+
+        assertThat(words, equalTo(expected));
+    }
+
+    @Test
+    public void splitCamelCaseTest_prohibitSingleCharSeparation() {
+        boolean prohibitSingleCharSeparation = false;
+        String camelCaseWithNumbers = "2ABS45CamelXYZ123CaseSString";
+        List<String> words = splitCamelCase(camelCaseWithNumbers, prohibitSingleCharSeparation);
+
+        List<String> expected = List.of("2ABS", "45", "Camel", "XYZ", "123", "Case", "SString");
+
+        assertThat(words, equalTo(expected));
+    }
+
+    @Test
+    public void normalizeUnderscoresTest() {
+        String target = "_a__b______c_d__";
+        String expected = "a_b_c_d";
+        String result = normalizeUnderscores(target);
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test
+    public void replaceAllTest() {
+        String result = StringUtils.replaceAllWith(
+                "?", new StringBuilder("SQL ? ? ?"), 3, List.of("AA", "B?B", "CC"), false);
+        String expected = "SQL AA B?B CC";
+        assertThat(result, equalTo(expected));
     }
 }

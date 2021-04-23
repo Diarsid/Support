@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diarsid.support.objects.references.impl;
+package diarsid.support.objects.references;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import diarsid.support.objects.references.Reference;
 
 /**
  *
@@ -53,6 +52,18 @@ public interface Possible<T> extends Reference<T>, Supplier<T> {
     T resetTo(Optional<T> optionalT);
 
     T resetTo(Possible<T> possibleT);
+
+    default T resetOrMerge(T newT, BiFunction<T, T, T> oldAndNewMerging) {
+        if ( this.isPresent() ) {
+            T oldT = this.orThrow();
+            T merged = oldAndNewMerging.apply(oldT, newT);
+            this.resetTo(merged);
+            return oldT;
+        }
+        else {
+            return this.resetTo(newT);
+        }
+    }
 
     default T resetTo(Supplier<T> supplierT) {
         return this.resetTo(supplierT.get());

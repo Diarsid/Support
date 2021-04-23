@@ -63,6 +63,11 @@ public class MultilineMessage {
         return this;
     }
 
+    public MultilineMessage indent(int level) {
+        message.append(indent.repeat(level));
+        return this;
+    }
+
     public MultilineMessage indent(IndentLevel indentLevel) {
         message.append(indentLevel.string());
         return this;

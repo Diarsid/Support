@@ -1,8 +1,6 @@
-package diarsid.support.objects.references.impl;
+package diarsid.support.objects.references;
 
 import java.util.function.Supplier;
-
-import diarsid.support.objects.references.Reference;
 
 public interface Present<T> extends Reference<T>, Supplier<T> {
 

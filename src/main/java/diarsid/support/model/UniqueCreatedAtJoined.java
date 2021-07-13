@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
-import static java.util.UUID.randomUUID;
 
 public class UniqueCreatedAtJoined<L, R> implements Unique, CreatedAt, Joined<L, R> {
 
@@ -14,8 +13,8 @@ public class UniqueCreatedAtJoined<L, R> implements Unique, CreatedAt, Joined<L,
     private final L left;
     private final R right;
 
-    public UniqueCreatedAtJoined(L left, R right) {
-        this.uuid = randomUUID();
+    public UniqueCreatedAtJoined(UUID uuid, L left, R right) {
+        this.uuid = uuid;
         this.createdAt = now();
         this.left = left;
         this.right = right;

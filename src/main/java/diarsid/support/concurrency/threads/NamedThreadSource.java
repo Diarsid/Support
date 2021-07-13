@@ -18,7 +18,7 @@ public class NamedThreadSource {
 
     public NamedThreadSource(String namePrefix) {
         this.namePrefix = namePrefix;
-        this.asyncDefault = newNamedCachedThreadPool("Async.Default");
+        this.asyncDefault = newNamedCachedThreadPool(namePrefix + ".async.default");
     }
 
     public void closeThreads() {

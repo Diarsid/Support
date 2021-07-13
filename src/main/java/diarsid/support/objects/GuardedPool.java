@@ -31,6 +31,7 @@ public final class GuardedPool<T extends PooledReusable> {
         this.tInitializer = null;
         this.hasInitializer = false;
     }
+
     public GuardedPool(Supplier<T> newTSupplier, Consumer<T> tInitializer) {
         this.monitor = new Object();
         this.queue = new ArrayDeque<>();

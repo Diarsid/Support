@@ -1,6 +1,7 @@
 module diarsid.support {
 
-    requires slf4j.api;
+    requires java.desktop;
+    requires org.slf4j;
 
     exports diarsid.support.callbacks;
     exports diarsid.support.callbacks.groups;
@@ -10,6 +11,7 @@ module diarsid.support {
     exports diarsid.support.concurrency.threads;
     exports diarsid.support.configuration;
     exports diarsid.support.exceptions;
+    exports diarsid.support.filesystem;
     exports diarsid.support.functional;
     exports diarsid.support.log;
     exports diarsid.support.lang;

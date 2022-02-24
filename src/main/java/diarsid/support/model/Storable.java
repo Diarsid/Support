@@ -1,8 +1,10 @@
 package diarsid.support.model;
 
+import java.io.Serializable;
+
 import diarsid.support.objects.CommonEnum;
 
-public interface Storable {
+public interface Storable extends Serializable {
 
     enum State implements CommonEnum<State> {
         STORED,

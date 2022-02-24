@@ -1,13 +1,18 @@
 package diarsid.support.objects;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import diarsid.support.exceptions.FailedExpectationException;
 import diarsid.support.exceptions.UnsupportedEnumException;
 
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Objects.isNull;
 
-public interface CommonEnum<E extends Enum<E>> {
+public interface CommonEnum<E extends Enum<E>> extends Serializable, Equalable<E> {
 
     default boolean equalTo(E other) {
         return this.equals(other);
@@ -104,6 +109,39 @@ public interface CommonEnum<E extends Enum<E>> {
 
     default void throwUnsupported() {
         throw new UnsupportedEnumException((Enum<?>) this);
+    }
+
+    default void mustBe(E other) {
+        if ( this.notEqualTo(other) ) {
+            throw new FailedExpectationException(other, this);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default void mustNotBe(E other) {
+        if ( this.equalTo(other) ) {
+            CommonEnum<E> e = (CommonEnum<E>) other;
+            throw new FailedExpectationException(e.others(), this);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default List<E> all() {
+        Enum<E> eEnum = (Enum<E>) this;
+        E[] values = eEnum.getDeclaringClass().getEnumConstants();
+        return asList(values);
+    }
+
+    @SuppressWarnings("unchecked")
+    default List<E> others() {
+        Enum<E> eEnum = (Enum<E>) this;
+        E[] values = eEnum.getDeclaringClass().getEnumConstants();
+        List<E> all = new ArrayList<>();
+        for ( E e : values ) {
+            all.add(e);
+        }
+        all.remove(this);
+        return all;
     }
 
 }

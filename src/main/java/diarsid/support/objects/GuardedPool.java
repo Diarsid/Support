@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package diarsid.support.objects;
 
 import java.util.ArrayDeque;
@@ -11,11 +6,6 @@ import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-
-/**
- *
- * @author Diarsid
- */
 public final class GuardedPool<T extends PooledReusable> {
     
     private final Object monitor;

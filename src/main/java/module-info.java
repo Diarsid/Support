@@ -11,7 +11,6 @@ module diarsid.support {
     exports diarsid.support.concurrency.threads;
     exports diarsid.support.configuration;
     exports diarsid.support.exceptions;
-    exports diarsid.support.filesystem;
     exports diarsid.support.functional;
     exports diarsid.support.log;
     exports diarsid.support.lang;

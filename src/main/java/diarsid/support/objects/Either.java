@@ -1,6 +1,8 @@
 package diarsid.support.objects;
 
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.Objects.isNull;
 
@@ -10,7 +12,8 @@ import static diarsid.support.objects.Either.Side.RIGHT;
 public final class Either<L, R> {
 
     public static enum Side implements CommonEnum<Side> {
-        LEFT, RIGHT
+        LEFT,
+        RIGHT
     }
 
     public final L left;
@@ -43,6 +46,24 @@ public final class Either<L, R> {
 
     public static <L, R> Either<L, R> anyOfEither(L left, R right) {
         return new Either<>(left, right);
+    }
+
+    public L leftOrThrow(Function<R, RuntimeException> exceptionOfRight) {
+        if ( side == LEFT ) {
+            return left;
+        }
+        else {
+            throw exceptionOfRight.apply(right);
+        }
+    }
+
+    public R rightOrThrow(Function<L, RuntimeException> exceptionOfLeft) {
+        if ( side == RIGHT ) {
+            return right;
+        }
+        else {
+            throw exceptionOfLeft.apply(left);
+        }
     }
 
     @Override

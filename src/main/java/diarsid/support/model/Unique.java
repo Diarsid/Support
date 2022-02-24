@@ -6,9 +6,14 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
-public interface Unique {
+public interface Unique extends Identity<UUID> {
 
     UUID uuid();
+
+    @Override
+    default UUID id() {
+        return this.uuid();
+    }
 
     default boolean has(UUID uuid) {
         return this.uuid().equals(uuid);

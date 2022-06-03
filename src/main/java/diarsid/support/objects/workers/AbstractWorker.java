@@ -1,9 +1,13 @@
 package diarsid.support.objects.workers;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import static diarsid.support.objects.workers.WorkerState.WORKING;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_DONE;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_FAILED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_NOT_NEEDED;
+import static diarsid.support.objects.workers.WorkerStateTransition.TO_WORKING;
 
 public abstract class AbstractWorker implements Worker {
 
@@ -32,8 +36,19 @@ public abstract class AbstractWorker implements Worker {
         return this.stateTransition;
     }
 
+    protected final boolean isInStateOrTransitingToState(WorkerState someState, WorkerStateTransition someTransition) {
+        WorkerStateTransition transition = this.stateTransition.current();
+
+        if ( this.state.current().equals(someState) ) {
+            return isNull(transition) || transition.equals(someTransition);
+        }
+        else {
+            return nonNull(transition) && transition.equals(someTransition);
+        }
+    }
+
     protected final boolean isWorkingOrTransitingToWorking() {
-        return this.stateTransition.isIn(WorkerStateTransition.TO_WORKING) || this.state.current().equals(WORKING);
+        return this.isInStateOrTransitingToState(WORKING, TO_WORKING);
     }
 
     @Override

@@ -4,6 +4,7 @@ import static diarsid.support.objects.workers.WorkerState.PAUSED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_DONE;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_FAILED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_NOT_NEEDED;
+import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractPausableWorker
         extends AbstractWorker
@@ -16,7 +17,7 @@ public abstract class AbstractPausableWorker
     protected abstract boolean doPauseWork();
 
     protected final boolean isPausedOrTransitingToPaused() {
-        return super.stateTransition().isIn(WorkerStateTransition.TO_PAUSED) || super.state().current().equals(PAUSED);
+        return super.isInStateOrTransitingToState(PAUSED, TO_PAUSED);
     }
 
     @Override

@@ -4,6 +4,7 @@ import static diarsid.support.objects.workers.WorkerState.DESTROYED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_DONE;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_FAILED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_NOT_NEEDED;
+import static diarsid.support.objects.workers.WorkerStateTransition.TO_DESTROYED;
 
 public abstract class AbstractDestroyableWorker
         extends AbstractWorker
@@ -16,7 +17,7 @@ public abstract class AbstractDestroyableWorker
     protected abstract boolean doDestroy();
 
     protected final boolean isDestroyedOrTransitingToDestroyed() {
-        return super.stateTransition().isIn(WorkerStateTransition.TO_DESTROYED) || super.state().current().equals(DESTROYED);
+        return super.isInStateOrTransitingToState(DESTROYED, TO_DESTROYED);
     }
 
     @Override
@@ -25,7 +26,7 @@ public abstract class AbstractDestroyableWorker
             return CHANGE_NOT_NEEDED;
         }
 
-        super.stateTransition().beginTransitionTo(WorkerStateTransition.TO_DESTROYED);
+        super.stateTransition().beginTransitionTo(TO_DESTROYED);
         try {
             if (doDestroy()) {
                 super.state().changeTo(DESTROYED);

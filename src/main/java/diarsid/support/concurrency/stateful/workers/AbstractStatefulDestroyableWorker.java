@@ -15,6 +15,14 @@ public abstract class AbstractStatefulDestroyableWorker
         extends AbstractStatefulWorker
         implements DestroyableWorker {
 
+    public AbstractStatefulDestroyableWorker() {
+        super();
+    }
+
+    public AbstractStatefulDestroyableWorker(BiConsumer<String, Throwable> unexpectedExceptionsConsumer) {
+        super(unexpectedExceptionsConsumer);
+    }
+
     public AbstractStatefulDestroyableWorker(String name) {
         super(name);
     }
@@ -26,7 +34,7 @@ public abstract class AbstractStatefulDestroyableWorker
     protected abstract boolean doSynchronizedDestroy();
 
     protected final boolean isDestroyedOrTransitingToDestroyed() {
-        return super.stateTransition().isIn(TO_DESTROYED) || super.state().current().equals(DESTROYED);
+        return super.isInStateOrTransitingToState(DESTROYED, TO_DESTROYED);
     }
 
     @Override

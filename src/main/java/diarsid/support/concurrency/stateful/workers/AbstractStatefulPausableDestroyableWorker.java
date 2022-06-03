@@ -24,6 +24,14 @@ public abstract class AbstractStatefulPausableDestroyableWorker
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
+    public AbstractStatefulPausableDestroyableWorker() {
+        super();
+    }
+
+    public AbstractStatefulPausableDestroyableWorker(BiConsumer<String, Throwable> unexpectedExceptionsConsumer) {
+        super(unexpectedExceptionsConsumer);
+    }
+
     public AbstractStatefulPausableDestroyableWorker(String name) {
         super(name);
     }
@@ -37,11 +45,11 @@ public abstract class AbstractStatefulPausableDestroyableWorker
     protected abstract boolean doSynchronizedDestroy();
 
     protected final boolean isPausedOrTransitingToPaused() {
-        return super.stateTransition().isIn(TO_PAUSED) || super.state().current().equals(PAUSED);
+        return super.isInStateOrTransitingToState(PAUSED, TO_PAUSED);
     }
 
     protected final boolean isDestroyedOrTransitingToDestroyed() {
-        return super.stateTransition().isIn(TO_DESTROYED) || super.state().current().equals(DESTROYED);
+        return super.isInStateOrTransitingToState(DESTROYED, TO_DESTROYED);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class ModifiableWorkerStateTransition {
     private final String className;
     private final String objName;
     private final Logger log;
-    private WorkerStateTransition stateTransition;
+    private WorkerStateTransition current;
 
     public ModifiableWorkerStateTransition(String className, String objName) {
         this.className = className;
@@ -20,22 +20,22 @@ public class ModifiableWorkerStateTransition {
     }
 
     public void beginTransitionTo(WorkerStateTransition other) {
-        if (nonNull(stateTransition)) {
+        if (nonNull(current)) {
             String message = format(
                     "Worker %s is in state transition %s and it cannot be changed to %s",
-                    objName, stateTransition.name(), other.name());
+                    objName, current.name(), other.name());
             log.error(message);
             throw new IllegalStateException(message);
         }
-        stateTransition = other;
+        current = other;
     }
 
     public void stopCurrentTransition() {
-        stateTransition = null;
+        current = null;
     }
 
-    public boolean isIn(WorkerStateTransition transition) {
-        WorkerStateTransition currentTransition = stateTransition;
-        return nonNull(currentTransition) && currentTransition.equals(transition);
+    public WorkerStateTransition current() {
+        return current;
     }
+
 }

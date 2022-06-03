@@ -1,6 +1,7 @@
 package diarsid.support.concurrency.threads;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,10 +17,12 @@ public class IncrementThreadsNaming implements ThreadsNaming {
     }
 
     private final String formatTemplate;
+    private final Optional<String> formatTemplateOpt;
     private final AtomicLong counter;
 
     public IncrementThreadsNaming(String formatTemplate) {
         this.formatTemplate = formatTemplate;
+        this.formatTemplateOpt = Optional.of(formatTemplate);
         AtomicLong counterToUse;
         synchronized (COUNTERS_BY_FORMAT) {
             AtomicLong existedCounter = COUNTERS_BY_FORMAT.get(formatTemplate);
@@ -34,8 +37,8 @@ public class IncrementThreadsNaming implements ThreadsNaming {
     }
 
     @Override
-    public String nameFormat() {
-        return formatTemplate;
+    public Optional<String> nameFormat() {
+        return formatTemplateOpt;
     }
 
     @Override

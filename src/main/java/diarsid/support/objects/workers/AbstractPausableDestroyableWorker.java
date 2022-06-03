@@ -11,6 +11,8 @@ import static diarsid.support.objects.workers.WorkerState.WORKING;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_DONE;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_FAILED;
 import static diarsid.support.objects.workers.WorkerStateChange.CHANGE_NOT_NEEDED;
+import static diarsid.support.objects.workers.WorkerStateTransition.TO_DESTROYED;
+import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractPausableDestroyableWorker
         extends AbstractWorker
@@ -27,11 +29,11 @@ public abstract class AbstractPausableDestroyableWorker
     protected abstract boolean doDestroy();
 
     protected final boolean isPausedOrTransitingToPaused() {
-        return super.stateTransition().isIn(WorkerStateTransition.TO_PAUSED) || super.state().current().equals(PAUSED);
+        return super.isInStateOrTransitingToState(PAUSED, TO_PAUSED);
     }
 
     protected final boolean isDestroyedOrTransitingToDestroyed() {
-        return super.stateTransition().isIn(WorkerStateTransition.TO_DESTROYED) || super.state().current().equals(DESTROYED);
+        return super.isInStateOrTransitingToState(DESTROYED, TO_DESTROYED);
     }
 
     @Override
@@ -40,7 +42,7 @@ public abstract class AbstractPausableDestroyableWorker
             return CHANGE_NOT_NEEDED;
         }
 
-        super.stateTransition().beginTransitionTo(WorkerStateTransition.TO_PAUSED);
+        super.stateTransition().beginTransitionTo(TO_PAUSED);
         try {
             if (doPauseWork()) {
                 super.state().changeTo(PAUSED);

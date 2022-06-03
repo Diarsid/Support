@@ -15,6 +15,14 @@ public abstract class AbstractStatefulPausableWorker
         extends AbstractStatefulWorker
         implements PausableWorker {
 
+    public AbstractStatefulPausableWorker() {
+        super();
+    }
+
+    public AbstractStatefulPausableWorker(BiConsumer<String, Throwable> unexpectedExceptionsConsumer) {
+        super(unexpectedExceptionsConsumer);
+    }
+
     public AbstractStatefulPausableWorker(String name) {
         super(name);
     }
@@ -26,7 +34,7 @@ public abstract class AbstractStatefulPausableWorker
     protected abstract boolean doSynchronizedPauseWork();
 
     protected final boolean isPausedOrTransitingToPaused() {
-        return super.stateTransition().isIn(TO_PAUSED) || super.state().current().equals(PAUSED);
+        return super.isInStateOrTransitingToState(PAUSED, TO_PAUSED);
     }
 
     @Override

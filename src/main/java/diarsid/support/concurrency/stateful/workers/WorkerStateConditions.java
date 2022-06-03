@@ -81,8 +81,8 @@ class WorkerStateConditions {
 
             } else {
                 throw new UnsupportedOperationException(format(
-                        "Offered state %s is not supported by %s '%s'",
-                        offeredState, this.getClass().getSimpleName(), this.worker.name()));
+                        "Offered state %s is not supported by %s",
+                        offeredState, this.worker.name()));
             }
         }
     }

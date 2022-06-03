@@ -1,8 +1,10 @@
 package diarsid.support.concurrency.threads;
 
+import java.util.Optional;
+
 public interface ThreadsNaming {
 
-    String nameFormat();
+    Optional<String> nameFormat();
 
     String nextName();
 }

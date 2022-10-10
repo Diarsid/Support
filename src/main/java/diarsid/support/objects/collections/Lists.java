@@ -25,4 +25,10 @@ public class Lists {
 
         return a.stream().anyMatch(b::contains);
     }
+
+    public static void fillNulls(List<?> list, int size) {
+        for ( int i = 0; i < size; i++) {
+            list.add(null);
+        }
+    }
 }

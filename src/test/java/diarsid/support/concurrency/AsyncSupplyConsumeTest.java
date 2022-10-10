@@ -3,18 +3,18 @@ package diarsid.support.concurrency;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
-public class AsyncTransferTest {
+public class AsyncSupplyConsumeTest {
 
     @Test
     public void test() throws Exception {
         BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);
 
-        AsyncTransfer<String> p = new AsyncTransfer<>(
+        AsyncSupplyConsume<String> p = new AsyncSupplyConsume<>(
                 "test",
                 () -> {
                     var s = queue.take();

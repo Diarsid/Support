@@ -3,8 +3,7 @@ package diarsid.support.strings;
 
 import java.util.List;
 
-import diarsid.support.objects.collections.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static diarsid.support.strings.PathUtils.decomposePath;
 

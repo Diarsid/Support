@@ -6,20 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import diarsid.test.BaseTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static java.util.stream.Collectors.toList;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AdjacencyListTreeTest extends BaseTest {
 
     private AdjacencyListTree<String> tree;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tree = new AdjacencyListTree<>(
                 "1",
@@ -53,14 +52,14 @@ public class AdjacencyListTreeTest extends BaseTest {
         tree.add("10", "12");
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_add() {
 
         tree.remove("2");
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_addPath_absoluteRoute() {
 
@@ -68,7 +67,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         int a = 5;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_addPath_relativeRoute() {
 
@@ -76,7 +75,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         int a = 5;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_absPathOfNodes() {
 
@@ -84,7 +83,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         int a = 5;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_add_2() {
 
@@ -103,7 +102,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         a = 7;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_add_3() {
 
@@ -112,34 +111,34 @@ public class AdjacencyListTreeTest extends BaseTest {
         int b = 5;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_childrenOf_all() {
         List<String> children = tree.childrenOf("3");
         List<String> expectedChildren = List.of("7", "8");
 
-        assertThat(children, equalTo(expectedChildren));
+        assertThat(children).isEqualTo(expectedChildren);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_childrenOf_all_2() {
         List<String> children = tree.childrenOf("2");
         List<String> expectedChildren = List.of("5", "6", "9", "10", "11", "12");
 
-        assertThat(children, equalTo(expectedChildren));
+        assertThat(children).isEqualTo(expectedChildren);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_childrenOfDepth_all_2() {
         List<String> children = tree.childrenOf("2", 2);
         List<String> expectedChildren = List.of("5", "6", "9", "10");
 
-        assertThat(children, equalTo(expectedChildren));
+        assertThat(children).isEqualTo(expectedChildren);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_moveAndNotify() {
         List<TreePath<String>> oldPaths = new ArrayList<>();
@@ -153,7 +152,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         int a = 5;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_move_X() {
 
@@ -164,7 +163,7 @@ public class AdjacencyListTreeTest extends BaseTest {
         TreePath<String> path3 = tree.absolutePathTo("10");
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_copy_single() {
         String nodeToCopy = "12";
@@ -172,14 +171,14 @@ public class AdjacencyListTreeTest extends BaseTest {
 
         tree.copy(nodeToCopy, "2");
 
-        assertThat(tree.all().contains(expectedCopy), equalTo(true));
+        assertThat(tree.all()).contains(expectedCopy);
 
         TreePath<String> expectedCopyPath = tree.absolutePathTo(expectedCopy);
 
-        assertThat(expectedCopyPath.string(), equalTo("1/2/12 (1)"));
+        assertThat(expectedCopyPath.string()).isEqualTo("1/2/12 (1)");
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test_copy_withChildren() {
         String nodeToCopy = "10";
@@ -188,54 +187,54 @@ public class AdjacencyListTreeTest extends BaseTest {
 
         tree.copy(nodeToCopy, "2");
 
-        assertThat(tree.all().contains(expectedCopy), equalTo(true));
+        assertThat(tree.all()).contains(expectedCopy);
 
         for ( String expectedCopyChild : expectedCopyChildren ) {
-            assertThat(tree.all().contains(expectedCopyChild), equalTo(true));
+            assertThat(tree.all()).contains(expectedCopyChild);
         }
 
         TreePath<String> expectedCopyPath = tree.absolutePathTo(expectedCopy);
 
-        assertThat(expectedCopyPath.string(), equalTo("1/2/10 (1)"));
+        assertThat(expectedCopyPath.string()).isEqualTo("1/2/10 (1)");
 
         List<TreePath<String>> copiedChildren = tree.childrenAbsolutePathsOf(expectedCopy);
-        assertThat(copiedChildren.size(), equalTo(expectedCopyChildren.size()));
-        assertThat(copiedChildren, equalTo(expectedCopyChildren));
+        assertThat(copiedChildren.size()).isEqualTo(expectedCopyChildren.size());
+        assertThat(copiedChildren).isEqualTo(expectedCopyChildren);
     }
 
     @Test
     public void test_subPaths_startsWith() {
         TreePath<String> path = tree.absolutePathTo("12");
-        assertThat(path.string(), equalTo("1/2/6/10/12"));
+        assertThat(path.string()).isEqualTo("1/2/6/10/12");
 
         TreePath<String> shorterPath = tree.absolutePathTo("6");
 
-        assertThat(path.startsWith(shorterPath), equalTo(true));
-        assertThat(path.contains(shorterPath), equalTo(true));
+        assertThat(path.startsWith(shorterPath)).isEqualTo(true);
+        assertThat(path.contains(shorterPath)).isEqualTo(true);
     }
 
     @Test
     public void test_subPaths_endsWith() {
         TreePath<String> path = tree.absolutePathTo("12");
-        assertThat(path.string(), equalTo("1/2/6/10/12"));
+        assertThat(path.string()).isEqualTo("1/2/6/10/12");
 
         TreePath<String> subPath = path.relativeTo("6");
 
-        assertThat(path.endsWith(subPath), equalTo(true));
-        assertThat(path.contains(subPath), equalTo(true));
-        assertThat(subPath.string(), equalTo("10/12"));
+        assertThat(path.endsWith(subPath)).isTrue();
+        assertThat(path.contains(subPath)).isTrue();
+        assertThat(subPath.string()).isEqualTo("10/12");
     }
 
     @Test
     public void test_subPaths_contains() {
         TreePath<String> path = tree.absolutePathTo("12");
-        assertThat(path.string(), equalTo("1/2/6/10/12"));
+        assertThat(path.string()).isEqualTo("1/2/6/10/12");
 
         TreePath<String> shorterPath = tree.absolutePathTo("10");
         TreePath<String> subPath = shorterPath.relativeTo("6");
 
-        assertThat(path.contains(subPath), equalTo(true));
-        assertThat(subPath.string(), equalTo("10"));
+        assertThat(path.contains(subPath)).isEqualTo(true);
+        assertThat(subPath.string()).isEqualTo("10");
     }
 
     @Test
@@ -256,23 +255,23 @@ public class AdjacencyListTreeTest extends BaseTest {
                 .map(path -> path.relativeTo("99"))
                 .collect(toList());
 
-        assertThat(childrenToRemovedSubPath, equalTo(childrenMovedSubPath));
+        assertThat(childrenToRemovedSubPath).isEqualTo(childrenMovedSubPath);
 
-        assertThat(tree.all.contains("3"), equalTo(false));
+        assertThat(tree.all.contains("3")).isFalse();
         TreePath<String> replacedPath;
         for ( TreePath<String> oldPath : childrenToRemoved ) {
-            assertThat(oldPath.isValid(), equalTo(false));
-            assertThat(tree.doesExist(oldPath), equalTo(false));
+            assertThat(oldPath.isValid()).isFalse();
+            assertThat(tree.doesExist(oldPath)).isFalse();
             replacedPath = tree.absolutePathTo(oldPath.leaf());
-            assertThat(replacedPath.contains("99"), equalTo(true));
+            assertThat(replacedPath.contains("99")).isTrue();
         }
     }
 
     @Test
     public void test_path_root() {
         TreePath<String> path = tree.absolutePathTo("1");
-        assertThat(path.string(), equalTo("1"));
-        assertThat(path.nodes().size(), equalTo(1));
+        assertThat(path.string()).isEqualTo("1");
+        assertThat(path.nodes().size()).isEqualTo(1);
     }
 
     @Test
@@ -281,6 +280,6 @@ public class AdjacencyListTreeTest extends BaseTest {
 
         TreePathConverter<String, Path> converter = new TreePathConverterToNioPath(false);
         Path nioPath = converter.convert(path);
-        assertThat(nioPath, equalTo(Paths.get("2/6/10/12")));
+        assertThat(nioPath).isEqualTo(Paths.get("2/6/10/12"));
     }
 }

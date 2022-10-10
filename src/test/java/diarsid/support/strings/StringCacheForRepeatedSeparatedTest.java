@@ -1,9 +1,8 @@
 package diarsid.support.strings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class StringCacheForRepeatedSeparatedTest {
 
@@ -11,6 +10,6 @@ public class StringCacheForRepeatedSeparatedTest {
     public void test() {
         StringCacheForRepeatedSeparated cache = new StringCacheForRepeatedSeparated("?", ", ");
 
-        assertThat(cache.getFor(3), equalTo("?, ?, ?"));
+        assertThat(cache.getFor(3)).isEqualTo("?, ?, ?");
     }
 }

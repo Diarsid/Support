@@ -8,10 +8,10 @@ package diarsid.support.objects.collections;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static diarsid.support.objects.collections.CollectionUtils.shrink;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -32,7 +32,7 @@ public class CollectionsUtilsTest {
         
         shrink(list, 2);
         
-        assertEquals(2, list.size());
+        assertThat(list).hasSize(2);
     }
     
 }

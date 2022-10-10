@@ -2,11 +2,10 @@ package diarsid.support.string.replace;
 
 import diarsid.support.strings.replace.Replace;
 import diarsid.support.strings.replace.ReplacePair;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static diarsid.support.strings.replace.Replace.replace;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReplaceTest {
 
@@ -20,6 +19,6 @@ public class ReplaceTest {
         String expected = "... LEFT JOIN ...";
         String actual = replace.doFor(target);
 
-        assertThat(actual, equalTo(expected));
+        assertThat(actual).isEqualTo(expected);
     }
 }

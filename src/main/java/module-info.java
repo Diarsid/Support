@@ -17,9 +17,12 @@ module diarsid.support {
     exports diarsid.support.metainfo;
     exports diarsid.support.misc;
     exports diarsid.support.model;
+    exports diarsid.support.model.versioning;
     exports diarsid.support.network;
     exports diarsid.support.objects;
     exports diarsid.support.objects.collections;
+    exports diarsid.support.objects.collections.trees;
+    exports diarsid.support.objects.corteges;
     exports diarsid.support.objects.groups;
     exports diarsid.support.objects.groups.async;
     exports diarsid.support.objects.references;

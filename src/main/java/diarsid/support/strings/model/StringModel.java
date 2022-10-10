@@ -93,6 +93,9 @@ public class StringModel {
     }
     
     private void clear() {
+        this.origin = null;
+        this.originLowerCase = null;
+        this.originLength = 0;
         this.separators.clear();
         this.repeatings.clear();
         this.usedCharsPositionsLists.forEach(List::clear);
@@ -103,5 +106,6 @@ public class StringModel {
         StringModel model = new StringModel();
         model.resetTo("boooks/Tolkien/the hobbit.pdf");
         model.clear();
+        int a = 5;
     }
 }

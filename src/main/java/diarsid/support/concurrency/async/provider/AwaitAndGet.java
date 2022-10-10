@@ -11,13 +11,13 @@ import java.util.function.Supplier;
  *
  * @author Diarsid
  */
-public interface AsyncProvider<T> {
+public interface AwaitAndGet<T> {
     
-    public static <T> AsyncProviderBuilder<T> asyncProvide(Supplier<T> tSupplier) {
+    public static <T> AsyncProviderBuilder<T> from(Supplier<T> tSupplier) {
         return new AsyncProviderBuilder<>(tSupplier);
     }
 
-    Awaited<T> await();
+    Awaited<T> awaitAndGet();
 
     Awaited<T> stop();
     

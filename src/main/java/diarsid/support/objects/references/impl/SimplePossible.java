@@ -98,7 +98,32 @@ public class SimplePossible<T> implements Possible<T> {
             return new SimplePossible<>();
         }        
     }
-    
+
+    @Override
+    public <R> R mapValueOrThrow(Function<T, R> mapper) {
+        if ( this.isPresent() ) {
+            return mapper.apply(this.t);
+        }
+        else {
+            throw new NullPointerException();
+        }
+    }
+
+    @Override
+    public <R> R mapValueOr(Function<T, R> mapper, R other) {
+        if ( this.isPresent() ) {
+            return mapper.apply(this.t);
+        }
+        else {
+            return other;
+        }
+    }
+
+    @Override
+    public <R> R mapValueOrNull(Function<T, R> mapper) {
+        return mapper.apply(this.t);
+    }
+
     @Override
     public T orThrow() {
         this.checkValueNotNull();

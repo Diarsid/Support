@@ -68,10 +68,10 @@ public class AsyncProviderBuilder<T> {
         return this;
     }    
     
-    public AsyncProvider<T> begin() {
+    public AwaitAndGet<T> begin() {
         this.checkState();
         RepeatedWaiting waiting = new RepeatedWaiting(this.millisToWaitAfterFail, this.maxAttempts);
-        AsyncProviderImpl<T> provider = new AsyncProviderImpl<>(
+        AwaitAndProviderImpl<T> provider = new AwaitAndProviderImpl<>(
                 this.tSupplier, 
                 waiting, 
                 this.callbackOnSupplierFail,

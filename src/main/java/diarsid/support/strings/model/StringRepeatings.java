@@ -43,7 +43,7 @@ class StringRepeatings {
     }
     
     void clear() {
-        this.usedRepeatings.forEach(repeating -> repeating.clear());
+        this.usedRepeatings.forEach(CharRepeatings::clear);
         this.usedRepeatings.clear();
         this.allRepeatedPositions.clear();
     }

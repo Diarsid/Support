@@ -31,6 +31,12 @@ public interface Possible<T> extends Reference<T>, Supplier<T> {
 
     <R> Possible<R> map(Function<T, R> mapper);
 
+    <R> R mapValueOrThrow(Function<T, R> mapper);
+
+    <R> R mapValueOr(Function<T, R> mapper, R other);
+
+    <R> R mapValueOrNull(Function<T, R> mapper);
+
     boolean notEquals(Possible<T> possibleT);
 
     T nullify();

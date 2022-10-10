@@ -5,12 +5,11 @@ import java.util.List;
 
 import diarsid.support.objects.collections.ListInsertion;
 import diarsid.support.objects.collections.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ListInsertionTest {
 
@@ -19,6 +18,6 @@ public class ListInsertionTest {
         ListInsertion insertion = new ListInsertion(1, 2, 3);
         List<String> list = new ArrayList<>(asList("A", "B", "C"));
         Lists.insertAfterEachElement(1, 2, 3).into(list);
-        assertThat(list.size(), equalTo(12));
+        assertThat(list).hasSize(12);
     }
 }

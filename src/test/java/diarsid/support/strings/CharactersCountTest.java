@@ -3,10 +3,9 @@ package diarsid.support.strings;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CharactersCountTest {
 
@@ -14,29 +13,29 @@ public class CharactersCountTest {
     public void test() {
         CharactersCount charactersCount = new CharactersCount();
         charactersCount.calculateIn("aaabbc");
-        assertThat(charactersCount.countOf('a'), equalTo(3));
-        assertThat(charactersCount.countOf('b'), equalTo(2));
-        assertThat(charactersCount.countOf('c'), equalTo(1));
-        assertThat(charactersCount.countOf('x'), equalTo(0));
+        assertThat(charactersCount.countOf('a')).isEqualTo(3);
+        assertThat(charactersCount.countOf('b')).isEqualTo(2);
+        assertThat(charactersCount.countOf('c')).isEqualTo(1);
+        assertThat(charactersCount.countOf('x')).isEqualTo(0);
 
         charactersCount.clear();
 
         String s2 = "xxxyy_";
         charactersCount.calculateIn(s2);
 
-        assertThat(charactersCount.countOf('a'), equalTo(0));
-        assertThat(charactersCount.countOf('b'), equalTo(0));
-        assertThat(charactersCount.countOf('c'), equalTo(0));
-        assertThat(charactersCount.countOf('x'), equalTo(3));
-        assertThat(charactersCount.countOf('y'), equalTo(2));
-        assertThat(charactersCount.countOf('_'), equalTo(1));
+        assertThat(charactersCount.countOf('a')).isEqualTo(0);
+        assertThat(charactersCount.countOf('b')).isEqualTo(0);
+        assertThat(charactersCount.countOf('c')).isEqualTo(0);
+        assertThat(charactersCount.countOf('x')).isEqualTo(3);
+        assertThat(charactersCount.countOf('y')).isEqualTo(2);
+        assertThat(charactersCount.countOf('_')).isEqualTo(1);
 
         AtomicInteger counter = new AtomicInteger(0);
         charactersCount.forEach((c, count) -> {
             counter.incrementAndGet();
         });
-        assertThat(counter.get(), equalTo(3));
-        assertThat(charactersCount.uniqueCharsQty(), equalTo(3));
+        assertThat(counter.get()).isEqualTo(3);
+        assertThat(charactersCount.uniqueCharsQty()).isEqualTo(3);
 
     }
 

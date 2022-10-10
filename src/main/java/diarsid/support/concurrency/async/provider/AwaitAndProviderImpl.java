@@ -5,13 +5,13 @@
  */
 package diarsid.support.concurrency.async.provider;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
-import static diarsid.support.concurrency.async.provider.AsyncProvider.asyncProvide;
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_COMPLETED;
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_FAILED;
 import static diarsid.support.concurrency.async.provider.AsyncProviderState.PROVIDING_RUNNING;
@@ -22,7 +22,7 @@ import static diarsid.support.concurrency.threads.ThreadsUtil.sleepSafely;
  *
  * @author Diarsid
  */
-class AsyncProviderImpl<T> implements AsyncProvider<T> {    
+class AwaitAndProviderImpl<T> implements AwaitAndGet<T> {
     
     /* NON NULL fields */
     private final Supplier<T> tUnsafeSupplier;
@@ -45,7 +45,7 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
     private boolean getMonitorReleased;
     private AsyncProviderState state;
 
-    AsyncProviderImpl(
+    AwaitAndProviderImpl(
             Supplier<T> tSupplier,    
             RepeatedWaiting waiting, 
             Consumer<Exception> nullableSupplierExceptionConsumer, 
@@ -70,7 +70,7 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
     
     void asyncStart() {
         this.state = PROVIDING_RUNNING;
-        runAsync(() -> this.doAsyncWaitingWork());        
+        runAsync(this::doAsyncWaitingWork);
     }
     
     private void doAsyncWaitingWork() {
@@ -84,11 +84,13 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
                             this.isCompleted = true;
                             this.state = PROVIDING_COMPLETED;
                             break supplyingLoop;
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e) {
                             this.tryConsumeSupplier(e);
                             if ( this.waiting.doesHaveAttempts() ) {
                                 this.supplyMonitor.wait(this.waiting.millis());
-                            } else {
+                            }
+                            else {
                                 this.tryDoWhenAttemptsExhausted();
                                 this.lastThrowedSupplierException = e;
                                 this.isFailed = true;
@@ -96,12 +98,14 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
                                 break supplyingLoop;
                             }
                         }
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         this.tryConsumeUnexpected(e);
                     }                    
                 }
             }
-        } finally {    
+        }
+        finally {
             synchronized ( this.getMonitor ) {
                 this.getMonitorReleased = true;
                 this.getMonitor.notifyAll();
@@ -110,12 +114,13 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
     }
     
     @Override
-    public Awaited<T> await() {
+    public Awaited<T> awaitAndGet() {
         synchronized ( this.getMonitor ) {
             if ( ! this.getMonitorReleased ) {
                 try {
                     this.getMonitor.wait();
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     this.tryConsumeUnexpected(e);
                 }
             }              
@@ -156,7 +161,8 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
         if ( nonNull(this.nullableActionOnAttemptsExhausted) ) {
             try {
                 this.nullableActionOnAttemptsExhausted.run();
-            } catch (Throwable e) {
+            }
+            catch (Throwable e) {
                 this.tryConsumeUnexpected(e);
             }
         }
@@ -166,7 +172,8 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
         if ( nonNull(this.nullableActionOnStopped) ) {
             try {
                 this.nullableActionOnStopped.run();
-            } catch (Throwable e) {
+            }
+            catch (Throwable e) {
                 this.tryConsumeUnexpected(e);
             }
         }
@@ -176,7 +183,8 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
         if ( nonNull(this.nullableSupplierExceptionConsumer) ) {
             try {
                 this.nullableSupplierExceptionConsumer.accept(e);
-            } catch (Throwable e1) {
+            }
+            catch (Throwable e1) {
                 this.tryConsumeUnexpected(e1);
             }
         }
@@ -186,7 +194,8 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
         if ( nonNull(this.nullableUnexpectedThrowableConsumer) ) {
             try {
                 this.nullableUnexpectedThrowableConsumer.accept(e);
-            } catch (Throwable e1) {
+            }
+            catch (Throwable e1) {
                 // ignore
             }
         }
@@ -207,7 +216,8 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
             sleepSafely(200);
             if ( this.fails == 0 ) {
                 return this.t;
-            } else {
+            }
+            else {
                 this.fails--;
                 throw new RuntimeException("fail!");
             }
@@ -215,29 +225,37 @@ class AsyncProviderImpl<T> implements AsyncProvider<T> {
         
     }
     
-    public static void main(String[] args) {
-        TestUnsafeSupplier<String> unsafeSupplier = new TestUnsafeSupplier<>("value", 100);
-        AsyncProvider<String> asyncProvider = asyncProvide(unsafeSupplier)
+    public static void main(String[] args) throws Exception {
+        TestUnsafeSupplier<String> unsafeSupplier = new TestUnsafeSupplier<>("value", 2);
+        AwaitAndGet<String> value = AwaitAndGet.from(unsafeSupplier)
                 .withMillisToWaitAfterFail(500)
-                .withMaxAttempts(2)
+                .withMaxAttempts(3)
                 .withCallbackOnSupplierFail((e) -> System.out.println("fail"))
                 .withCallbackOnUnexpectedFail((t) -> t.printStackTrace())
                 .withCallbackOnStopped(() -> System.out.println("stopped"))
                 .begin();
-        
+
+        CountDownLatch barier = new CountDownLatch(2);
+
         runAsync(() -> {
             try {
-                Awaited<String> awaitedString = asyncProvider.await();
+                Awaited<String> awaitedString = value.awaitAndGet();
                 System.out.println("getting thread: " + awaitedString);
-            } catch (Exception e) {
+                barier.countDown();
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }            
         });
         
         runAsync(() -> {
             sleepSafely(6020);
-            Awaited<String> awaitedString = asyncProvider.stop();
+            Awaited<String> awaitedString = value.stop();
             System.out.println("stopping thread: " + awaitedString);
+            barier.countDown();
         });
+
+        barier.await();
+        System.out.println("stop");
     }
 }

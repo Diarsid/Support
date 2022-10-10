@@ -6,9 +6,9 @@ import diarsid.support.concurrency.stateful.workers.AbstractStatefulPausableWork
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AsyncTransfer<T> extends AbstractStatefulPausableWorker {
+public class AsyncSupplyConsume<T> extends AbstractStatefulPausableWorker {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncTransfer.class);
+    private static final Logger log = LoggerFactory.getLogger(AsyncSupplyConsume.class);
 
     public interface InterruptableSupplier<T> {
 
@@ -25,14 +25,14 @@ public class AsyncTransfer<T> extends AbstractStatefulPausableWorker {
     private Thread waitingThread;
     private Thread notifiedThread;
 
-    public AsyncTransfer(
+    public AsyncSupplyConsume(
             InterruptableSupplier<T> waiting,
             Consumer<T> notified,
             boolean synchronizedConsumer) {
         this(null, waiting, notified, synchronizedConsumer);
     }
 
-    public AsyncTransfer(
+    public AsyncSupplyConsume(
             String name,
             InterruptableSupplier<T> waiting,
             Consumer<T> notified,
@@ -114,13 +114,13 @@ public class AsyncTransfer<T> extends AbstractStatefulPausableWorker {
         this.notifiedThread = new Thread(this.notifyLogic);
 
         this.waitingThread.setName(
-                AsyncTransfer.class.getSimpleName() +
+                AsyncSupplyConsume.class.getSimpleName() +
                 "." + super.name() +
                 "." + "waiting" +
                 "." + this.starts);
 
         this.notifiedThread.setName(
-                AsyncTransfer.class.getSimpleName() +
+                AsyncSupplyConsume.class.getSimpleName() +
                 "." + super.name() +
                 "." + "notified" +
                 "." + this.starts);

@@ -1,17 +1,9 @@
 package diarsid.support.strings;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 import java.util.List;
 
-import org.junit.Test;
-
 import diarsid.test.BaseTest;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 
@@ -19,19 +11,13 @@ import static diarsid.support.strings.StringUtils.normalizeUnderscores;
 import static diarsid.support.strings.StringUtils.splitByAnySeparators;
 import static diarsid.support.strings.StringUtils.splitByTextSeparators;
 import static diarsid.support.strings.StringUtils.splitCamelCase;
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 import static diarsid.support.strings.StringUtils.countCharMatchesIn;
 import static diarsid.support.strings.StringUtils.countOccurences;
 import static diarsid.support.strings.StringUtils.removeAllSeparators;
 import static diarsid.support.strings.StringUtils.splitToLines;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- *
- * @author Diarsid
- */
 public class StringUtilsTest extends BaseTest {
     
     @Test
@@ -39,19 +25,19 @@ public class StringUtilsTest extends BaseTest {
         String multilines = "line1\nline2\nline3\n";
         List<String> expected = asList("line1", "line2", "line3");
         
-        assertThat(splitToLines(multilines), equalTo(expected));
+        assertThat(splitToLines(multilines)).isEqualTo(expected);
     }
     
     @Test
     public void countOccurencesTest() {
-        assertThat(countOccurences("ABcABd", "AB"), equalTo(2));
+        assertThat(countOccurences("ABcABd", "AB")).isEqualTo(2);
     }
     
     @Test
     public void removeAllSeparatorsTest() {
         String target = "0_1-2\\3/4_5--6\\\\7//8__9";
         String result = removeAllSeparators(target);
-        assertThat(result, equalTo("0123456789"));
+        assertThat(result).isEqualTo("0123456789");
     }       
     
     @Test
@@ -60,7 +46,7 @@ public class StringUtilsTest extends BaseTest {
         String second = "abcd";
         
         int matches = countCharMatchesIn(first, 2, 4, second, 2, 4);
-        assertThat(matches, equalTo(2));
+        assertThat(matches).isEqualTo(2);
     }
     
     @Test
@@ -69,7 +55,7 @@ public class StringUtilsTest extends BaseTest {
         String second = "abcd_";
         
         int matches = countCharMatchesIn(first, 2, 5, second, 2, 5);
-        assertThat(matches, equalTo(2));
+        assertThat(matches).isEqualTo(2);
     }
     
     @Test
@@ -78,7 +64,7 @@ public class StringUtilsTest extends BaseTest {
         String second = "abcd_";
         
         int matches = countCharMatchesIn(first, 2, 5, second, 2, 5);
-        assertThat(matches, equalTo(2));
+        assertThat(matches).isEqualTo(2);
     }
     
     @Test
@@ -87,7 +73,7 @@ public class StringUtilsTest extends BaseTest {
         String second = "abcdc";
         
         int matches = countCharMatchesIn(first, 2, 5, second, 2, 5);
-        assertThat(matches, equalTo(3));
+        assertThat(matches).isEqualTo(3);
     }
 
     @Test
@@ -95,12 +81,12 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "word__one_*&_two_%-and_#third";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(5));
-        assertThat(words.get(0), equalTo("word"));
-        assertThat(words.get(1), equalTo("one"));
-        assertThat(words.get(2), equalTo("two"));
-        assertThat(words.get(3), equalTo("and"));
-        assertThat(words.get(4), equalTo("third"));
+        assertThat(words.size()).isEqualTo(5);
+        assertThat(words.get(0)).isEqualTo("word");
+        assertThat(words.get(1)).isEqualTo("one");
+        assertThat(words.get(2)).isEqualTo("two");
+        assertThat(words.get(3)).isEqualTo("and");
+        assertThat(words.get(4)).isEqualTo("third");
     }
 
     @Test
@@ -108,12 +94,12 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "__word__one_*&_two_%-and_#third";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(5));
-        assertThat(words.get(0), equalTo("word"));
-        assertThat(words.get(1), equalTo("one"));
-        assertThat(words.get(2), equalTo("two"));
-        assertThat(words.get(3), equalTo("and"));
-        assertThat(words.get(4), equalTo("third"));
+        assertThat(words.size()).isEqualTo(5);
+        assertThat(words.get(0)).isEqualTo("word");
+        assertThat(words.get(1)).isEqualTo("one");
+        assertThat(words.get(2)).isEqualTo("two");
+        assertThat(words.get(3)).isEqualTo("and");
+        assertThat(words.get(4)).isEqualTo("third");
     }
 
     @Test
@@ -121,12 +107,12 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "word__one_*&_two_%-and_#third__";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(5));
-        assertThat(words.get(0), equalTo("word"));
-        assertThat(words.get(1), equalTo("one"));
-        assertThat(words.get(2), equalTo("two"));
-        assertThat(words.get(3), equalTo("and"));
-        assertThat(words.get(4), equalTo("third"));
+        assertThat(words.size()).isEqualTo(5);
+        assertThat(words.get(0)).isEqualTo("word");
+        assertThat(words.get(1)).isEqualTo("one");
+        assertThat(words.get(2)).isEqualTo("two");
+        assertThat(words.get(3)).isEqualTo("and");
+        assertThat(words.get(4)).isEqualTo("third");
     }
 
     @Test
@@ -134,8 +120,8 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "word";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(1));
-        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.size()).isEqualTo(1);
+        assertThat(words.get(0)).isEqualTo("word");
     }
 
     @Test
@@ -143,8 +129,8 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "word__";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(1));
-        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.size()).isEqualTo(1);
+        assertThat(words.get(0)).isEqualTo("word");
     }
 
     @Test
@@ -152,8 +138,8 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "____word__";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(1));
-        assertThat(words.get(0), equalTo("word"));
+        assertThat(words.size()).isEqualTo(1);
+        assertThat(words.get(0)).isEqualTo("word");
     }
 
     @Test
@@ -161,7 +147,7 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "__";
 
         List<String> words = splitByTextSeparators(phrase);
-        assertThat(words.size(), equalTo(0));
+        assertThat(words.size()).isEqualTo(0);
     }
 
     @Test
@@ -169,7 +155,7 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "John D";
 
         List<String> words = splitByAnySeparators(phrase);
-        assertThat(words.size(), equalTo(2));
+        assertThat(words.size()).isEqualTo(2);
     }
 
     @Test
@@ -177,7 +163,7 @@ public class StringUtilsTest extends BaseTest {
         String phrase = "John Dd";
 
         List<String> words = splitByAnySeparators(phrase);
-        assertThat(words.size(), equalTo(2));
+        assertThat(words.size()).isEqualTo(2);
     }
 
     @Test
@@ -188,7 +174,7 @@ public class StringUtilsTest extends BaseTest {
 
         List<String> expected = List.of("2", "ABS", "45", "Camel", "XYZ", "123", "Case", "S", "String");
 
-        assertThat(words, equalTo(expected));
+        assertThat(words).isEqualTo(expected);
     }
 
     @Test
@@ -199,7 +185,7 @@ public class StringUtilsTest extends BaseTest {
 
         List<String> expected = List.of("2ABS", "45", "Camel", "XYZ", "123", "Case", "SString");
 
-        assertThat(words, equalTo(expected));
+        assertThat(words).isEqualTo(expected);
     }
 
     @Test
@@ -207,7 +193,7 @@ public class StringUtilsTest extends BaseTest {
         String target = "_a__b______c_d__";
         String expected = "a_b_c_d";
         String result = normalizeUnderscores(target);
-        assertThat(result, equalTo(expected));
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test
@@ -215,6 +201,6 @@ public class StringUtilsTest extends BaseTest {
         String result = StringUtils.replaceAllWith(
                 "?", new StringBuilder("SQL ? ? ?"), 3, List.of("AA", "B?B", "CC"), false);
         String expected = "SQL AA B?B CC";
-        assertThat(result, equalTo(expected));
+        assertThat(result).isEqualTo(expected);
     }
 }

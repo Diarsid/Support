@@ -30,7 +30,7 @@ public class StringTemplate {
 
         public static class Named extends Placeholder {
 
-            public static final char DEFAULT_STARD = '[';
+            public static final char DEFAULT_START = '[';
             public static final char DEFAULT_END = ']';
 
             private final String startChar;
@@ -42,7 +42,7 @@ public class StringTemplate {
             }
 
             public Named() {
-                this.startChar = String.valueOf(DEFAULT_STARD);
+                this.startChar = String.valueOf(DEFAULT_START);
                 this.endChar = String.valueOf(DEFAULT_END);
             }
         }

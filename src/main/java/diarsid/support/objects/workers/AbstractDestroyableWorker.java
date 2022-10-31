@@ -8,7 +8,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_DESTROYED
 
 public abstract class AbstractDestroyableWorker
         extends AbstractWorker
-        implements DestroyableWorker {
+        implements Worker.Destroyable {
 
     public AbstractDestroyableWorker(String name) {
         super(name);

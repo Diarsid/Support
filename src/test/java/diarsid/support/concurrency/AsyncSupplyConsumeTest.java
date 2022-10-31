@@ -2,6 +2,7 @@ package diarsid.support.concurrency;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ public class AsyncSupplyConsumeTest {
 
     @Test
     public void test() throws Exception {
-        BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);
+        SynchronousQueue<String> queue = new SynchronousQueue<>();
 
         AsyncSupplyConsume<String> p = new AsyncSupplyConsume<>(
                 "test",
@@ -24,8 +25,7 @@ public class AsyncSupplyConsumeTest {
                 (s) -> {
                     System.out.println("taken: " + s);
                 },
-                false
-        );
+                false);
 
         p.startWork();
 

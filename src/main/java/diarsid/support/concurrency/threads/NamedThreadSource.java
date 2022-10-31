@@ -22,8 +22,8 @@ public class NamedThreadSource {
 
     public NamedThreadSource(String namePrefix) {
         this.namePrefix = namePrefix;
-        this.asyncDefault = newNamedCachedThreadPool(namePrefix + ".async.default");
         this.executors = synchronizedList(new ArrayList<>());
+        this.asyncDefault = newNamedCachedThreadPool(namePrefix + ".async.default");
     }
 
     public void close() {

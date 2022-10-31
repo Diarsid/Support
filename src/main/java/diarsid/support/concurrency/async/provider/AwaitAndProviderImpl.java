@@ -38,7 +38,7 @@ class AwaitAndProviderImpl<T> implements AwaitAndGet<T> {
     
     /* mutable state */
     private T t;
-    private Exception lastThrowedSupplierException;
+    private Exception lastThrownSupplierException;
     private boolean isStopped;
     private boolean isCompleted;
     private boolean isFailed;
@@ -92,7 +92,7 @@ class AwaitAndProviderImpl<T> implements AwaitAndGet<T> {
                             }
                             else {
                                 this.tryDoWhenAttemptsExhausted();
-                                this.lastThrowedSupplierException = e;
+                                this.lastThrownSupplierException = e;
                                 this.isFailed = true;
                                 this.state = PROVIDING_FAILED;
                                 break supplyingLoop;
@@ -126,8 +126,8 @@ class AwaitAndProviderImpl<T> implements AwaitAndGet<T> {
             }              
         }
         synchronized ( this.supplyMonitor ) {
-            if ( nonNull(this.lastThrowedSupplierException) ) {
-                throw new RuntimeException(this.lastThrowedSupplierException);
+            if ( nonNull(this.lastThrownSupplierException) ) {
+                throw new RuntimeException(this.lastThrownSupplierException);
             }
             return new Awaited<>(this.t, this.state.awaitedResult());
         }

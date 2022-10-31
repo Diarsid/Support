@@ -16,7 +16,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractPausableDestroyableWorker
         extends AbstractWorker
-        implements PausableDestroyableWorker {
+        implements Worker.Pausable, Worker.Destroyable {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 

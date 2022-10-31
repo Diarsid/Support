@@ -6,22 +6,25 @@ public enum WorkerStateChange {
             /* change attempt =   */ true,
             /* change performed = */ true,
             /* in desired state = */ true),
+
     CHANGE_FAILED(
             /* change attempt =   */ true,
             /* change performed = */ false,
             /* in desired state = */ false),
+
     CHANGE_REJECTED(
             /* change attempt =   */ false,
             /* change performed = */ false,
             /* in desired state = */ false),
+
     CHANGE_NOT_NEEDED(
             /* change attempt =   */ false,
             /* change performed = */ false,
             /* in desired state = */ true);
 
-    boolean isChangeAttemptDone;
-    boolean isChangePerformed;
-    boolean isInDesiredState;
+    public boolean isChangeAttemptDone;
+    public boolean isChangePerformed;
+    public boolean isInDesiredState;
 
     WorkerStateChange(boolean isChangeAttemptDone, boolean isChangePerformed, boolean isInDesiredState) {
         this.isChangeAttemptDone = isChangeAttemptDone;

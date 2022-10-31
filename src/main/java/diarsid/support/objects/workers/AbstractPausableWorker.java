@@ -8,7 +8,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractPausableWorker
         extends AbstractWorker
-        implements PausableWorker {
+        implements Worker.Pausable {
 
     public AbstractPausableWorker(String name) {
         super(name);

@@ -4,7 +4,8 @@ import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import diarsid.support.objects.workers.PausableDestroyableWorker;
+
+import diarsid.support.objects.workers.Worker;
 import diarsid.support.objects.workers.WorkerStateChange;
 
 import static java.lang.String.format;
@@ -20,7 +21,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractStatefulPausableDestroyableWorker
         extends AbstractStatefulWorker
-        implements PausableDestroyableWorker {
+        implements Worker.Pausable, Worker.Destroyable {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 

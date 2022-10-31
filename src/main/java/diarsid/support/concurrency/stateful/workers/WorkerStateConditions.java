@@ -9,8 +9,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
-import diarsid.support.objects.workers.DestroyableWorker;
-import diarsid.support.objects.workers.PausableWorker;
+import diarsid.support.objects.workers.Worker;
 import diarsid.support.objects.workers.WorkerState;
 
 import static java.lang.String.format;
@@ -33,11 +32,11 @@ class WorkerStateConditions {
 
         this.workerStateChangeActions.put(WORKING, worker::startWork);
 
-        if (worker instanceof PausableWorker) {
-            this.workerStateChangeActions.put(PAUSED, ((PausableWorker) worker)::pauseWork);
+        if (worker instanceof Worker.Pausable) {
+            this.workerStateChangeActions.put(PAUSED, ((Worker.Pausable) worker)::pauseWork);
         }
-        if (worker instanceof DestroyableWorker) {
-            this.workerStateChangeActions.put(DESTROYED, ((DestroyableWorker) worker)::destroy);
+        if (worker instanceof Worker.Destroyable) {
+            this.workerStateChangeActions.put(DESTROYED, ((Worker.Destroyable) worker)::destroy);
         }
 
         this.readWriteLock = new ReentrantReadWriteLock(true);
@@ -75,11 +74,12 @@ class WorkerStateConditions {
                 readWriteLock.readLock().lock();
                 try {
                     workerStateChangeAction.run();
-                } finally {
+                }
+                finally {
                     readWriteLock.readLock().unlock();
                 }
-
-            } else {
+            }
+            else {
                 throw new UnsupportedOperationException(format(
                         "Offered state %s is not supported by %s",
                         offeredState, this.worker.name()));
@@ -94,12 +94,14 @@ class WorkerStateConditions {
         try {
             if (conditions.isEmpty()) {
                 allConditionsAllowWork = true;
-            } else {
+            }
+            else {
                 allConditionsAllowWork = conditions
                         .stream()
                         .allMatch(WorkerStateCondition::doesAllowWork);
             }
-        } finally {
+        }
+        finally {
             readWriteLock.readLock().unlock();
         }
 
@@ -117,7 +119,8 @@ class WorkerStateConditions {
         try {
             condition = new WorkerStateCondition<>(readWriteLock, this::tryChangeState, stateConditionT);
             conditions.add(condition);
-        } finally {
+        }
+        finally {
             readWriteLock.writeLock().unlock();
         }
 
@@ -131,7 +134,8 @@ class WorkerStateConditions {
         try {
             condition = new WorkerStateCondition<>(readWriteLock, this::tryChangeState, stateConditionT, initialT);
             conditions.add(condition);
-        } finally {
+        }
+        finally {
             readWriteLock.writeLock().unlock();
         }
 

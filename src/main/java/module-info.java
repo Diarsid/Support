@@ -7,6 +7,7 @@ module diarsid.support {
     exports diarsid.support.callbacks.groups;
     exports diarsid.support.concurrency;
     exports diarsid.support.concurrency.async.provider;
+    exports diarsid.support.concurrency.signals;
     exports diarsid.support.concurrency.stateful.workers;
     exports diarsid.support.concurrency.threads;
     exports diarsid.support.configuration;

@@ -135,6 +135,21 @@ public class SimplePossible<T> implements Possible<T> {
         this.checkValueNotNull();
         return this.nullify();
     }
+
+    @Override
+    public T extractOrNull() {
+        return this.nullify();
+    }
+
+    @Override
+    public T extractOr(T other) {
+        if ( isNull(this.t) ) {
+            return other;
+        }
+        else {
+            return this.nullify();
+        }
+    }
     
     @Override
     public T orThrow(Supplier<? extends RuntimeException> exceptionCreator) {

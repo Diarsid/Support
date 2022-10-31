@@ -53,6 +53,10 @@ public interface Possible<T> extends Reference<T>, Supplier<T> {
     
     T extractOrThrow();
 
+    T extractOrNull();
+
+    T extractOr(T t);
+
     T orThrow(Supplier<? extends RuntimeException> exceptionCreator);
 
     T resetTo(Optional<T> optionalT);

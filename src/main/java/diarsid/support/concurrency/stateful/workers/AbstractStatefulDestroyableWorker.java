@@ -2,7 +2,7 @@ package diarsid.support.concurrency.stateful.workers;
 
 import java.util.function.BiConsumer;
 
-import diarsid.support.objects.workers.DestroyableWorker;
+import diarsid.support.objects.workers.Worker;
 import diarsid.support.objects.workers.WorkerStateChange;
 
 import static diarsid.support.objects.workers.WorkerState.DESTROYED;
@@ -13,7 +13,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_DESTROYED
 
 public abstract class AbstractStatefulDestroyableWorker
         extends AbstractStatefulWorker
-        implements DestroyableWorker {
+        implements Worker.Destroyable {
 
     public AbstractStatefulDestroyableWorker() {
         super();

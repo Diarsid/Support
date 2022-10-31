@@ -2,7 +2,7 @@ package diarsid.support.concurrency.stateful.workers;
 
 import java.util.function.BiConsumer;
 
-import diarsid.support.objects.workers.PausableWorker;
+import diarsid.support.objects.workers.Worker;
 import diarsid.support.objects.workers.WorkerStateChange;
 
 import static diarsid.support.objects.workers.WorkerState.PAUSED;
@@ -13,7 +13,7 @@ import static diarsid.support.objects.workers.WorkerStateTransition.TO_PAUSED;
 
 public abstract class AbstractStatefulPausableWorker
         extends AbstractStatefulWorker
-        implements PausableWorker {
+        implements Worker.Pausable {
 
     public AbstractStatefulPausableWorker() {
         super();

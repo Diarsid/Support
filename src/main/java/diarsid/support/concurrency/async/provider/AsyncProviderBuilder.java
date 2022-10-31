@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package diarsid.support.concurrency.async.provider;
 
 import java.util.function.Consumer;
@@ -10,10 +5,6 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- *
- * @author Diarsid
- */
 public class AsyncProviderBuilder<T> {
     
     private final static int UNINITIALIZED = -3;

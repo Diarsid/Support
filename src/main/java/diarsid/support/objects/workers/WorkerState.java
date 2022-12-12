@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import diarsid.support.objects.CommonEnum;
+
 import static java.util.Arrays.stream;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 
-public enum WorkerState {
+public enum WorkerState implements CommonEnum<WorkerState> {
 
     CREATED,
     WORKING,

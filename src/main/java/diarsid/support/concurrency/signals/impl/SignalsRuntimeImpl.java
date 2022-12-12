@@ -24,7 +24,7 @@ public class SignalsRuntimeImpl extends AbstractStatefulDestroyableWorker implem
     @Override
     public Signal signal(String name) {
         return super.doSynchronizedReturnChange(() -> {
-            return this.signalsByNames.computeIfAbsent(name, this::newNamedEvent);
+            return this.signalsByNames.computeIfAbsent(name, this::newNamedSignal);
         });
     }
 
@@ -35,7 +35,7 @@ public class SignalsRuntimeImpl extends AbstractStatefulDestroyableWorker implem
         });
     }
 
-    private SignalImpl newNamedEvent(String name) {
+    private SignalImpl newNamedSignal(String name) {
         SignalImpl signal = new SignalImpl(
                 name,
                 this.namedThreadSource.newNamedCachedThreadPool("Event[" +name + "].listener"),

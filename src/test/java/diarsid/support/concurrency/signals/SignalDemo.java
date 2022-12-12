@@ -1,21 +1,18 @@
 package diarsid.support.concurrency.signals;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diarsid.support.concurrency.ThreadSleepInLoop;
 import diarsid.support.concurrency.signals.impl.SignalsRuntimeImpl;
 
-import static java.util.concurrent.CompletableFuture.runAsync;
-
+import static diarsid.support.concurrency.test.CurrentThread.async;
 import static diarsid.support.concurrency.threads.ThreadsUtil.sleepSafely;
 
-public class SignalTest {
+public class SignalDemo {
 
-    private static final Logger log = LoggerFactory.getLogger(SignalTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SignalDemo.class);
 
 //    @Test
 //    public void commonTest() {
@@ -68,7 +65,7 @@ public class SignalTest {
 //    }
 
     public static void main(String[] args) {
-        Signals signals = new SignalsRuntimeImpl();
+        Signals signals = Signals.Runtime.create();
 
         Signal signal = signals.signal("Event");
 
@@ -89,22 +86,21 @@ public class SignalTest {
 
         AtomicBoolean working = new AtomicBoolean(true);
 
-        AtomicInteger counter = new AtomicInteger(0);
-        var asyncSignalEmitting = new ThreadSleepInLoop.Async(
-                1000,
-                () -> signal.emitWith(counter.incrementAndGet()),
-                working);
-        asyncSignalEmitting.begin();
+        async()
+                .loopWhile(working)
+                .eachTimeSleep(1000)
+                .eachTimeDo((count) -> signal.emitWith(count));
 
-        runAsync(() -> {
-            sleepSafely(5_000);
-            signals.signal("Event").close();
-            log.info("after sleep");
-            working.set(false);
+        async()
+                .action(() -> {
+                    sleepSafely(5_000);
+                    signals.signal("Event").close();
+                    log.info("after sleep");
+                    working.set(false);
 //            events.close();
 //            events.event("Event").stop();
-            log.info("closed");
-        });
+                    log.info("closed");
+                });
     }
 
 }

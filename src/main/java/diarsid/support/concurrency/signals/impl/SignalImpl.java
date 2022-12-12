@@ -24,7 +24,7 @@ import static java.util.Objects.nonNull;
 
 import static diarsid.support.concurrency.threads.ThreadsUtil.shutdownAndWait;
 
-public class SignalImpl implements Named, Signal {
+class SignalImpl implements Named, Signal {
 
     private static final Logger log = LoggerFactory.getLogger(Signal.class);
 
@@ -103,7 +103,8 @@ public class SignalImpl implements Named, Signal {
                         break listeningLoop;
                     }
 
-                    this.signal.async.execute(this::invokeSafely);
+                    Object data = this.emittedData.extractOrNull();
+                    this.signal.async.execute(() -> this.invokeSafely(data));
                 }
                 catch (InterruptedException e) {
                     // ignore
@@ -114,9 +115,8 @@ public class SignalImpl implements Named, Signal {
             }
         }
 
-        private void invokeSafely() {
+        private void invokeSafely(Object data) {
             try {
-                Object data = this.emittedData.extractOrNull();
                 if ( this.isDataListener && nonNull(data) ) {
                     this.dataListener.onEmittedWith(data);
                 }

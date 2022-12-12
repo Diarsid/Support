@@ -41,6 +41,13 @@ public interface Signal extends Closeable {
 
     interface Listener extends Named {
 
+        enum ConcurrencyMode {
+            SEQUENTIAL,
+            PARALLEL;
+
+            public static final ConcurrencyMode DEFAULT = SEQUENTIAL;
+        }
+
         interface OfData extends Listener {
 
             void onEmittedWith(Object data);
@@ -48,8 +55,8 @@ public interface Signal extends Closeable {
 
         void onEmitted();
 
-        default void thrown(Throwable t) {
-            // to override
+        default Listener.ConcurrencyMode concurrencyMode() {
+            return ConcurrencyMode.DEFAULT;
         }
     }
 

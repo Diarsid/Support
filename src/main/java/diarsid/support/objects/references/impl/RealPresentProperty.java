@@ -15,9 +15,10 @@ import diarsid.support.objects.references.PresentProperty;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.UUID.randomUUID;
 
 import static diarsid.support.objects.references.Reference.Type.PROPERTY;
-import static diarsid.support.objects.references.Reference.ValuePresence.PRESENT;
+import static diarsid.support.objects.references.Reference.ValuePresence.NON_NULL;
 
 public class RealPresentProperty<T> implements PresentProperty<T>, RealBindable<T>, ListenableRemovable<T>  {
 
@@ -94,6 +95,11 @@ public class RealPresentProperty<T> implements PresentProperty<T>, RealBindable<
     }
 
     @Override
+    public <R> Readable.NonNull<R> map(Function<T, R> mapper) {
+        return new RealPresentProperty<>(mapper.apply(this.t), this.name + ".mapped:" + randomUUID());
+    }
+
+    @Override
     public boolean equalsTo(T otherT) {
         return this.t.equals(otherT);
     }
@@ -137,7 +143,7 @@ public class RealPresentProperty<T> implements PresentProperty<T>, RealBindable<
 
     @Override
     public ValuePresence valuePresence() {
-        return PRESENT;
+        return NON_NULL;
     }
 
     @Override
@@ -170,5 +176,18 @@ public class RealPresentProperty<T> implements PresentProperty<T>, RealBindable<
     @Override
     public int hashCode() {
         return Objects.hash(name, t);
+    }
+
+    @Override
+    public boolean notEqualsToOther(Readable<T> readableT) {
+        if ( readableT instanceof Readable.NonNull ) {
+            return Objects.equals(this.t, readableT.get());
+        }
+        else if ( readableT instanceof Readable.Nullable ) {
+            return Objects.equals(this.t, ((Readable.Nullable<T>) readableT).or(null) );
+        }
+        else {
+            return false;
+        }
     }
 }

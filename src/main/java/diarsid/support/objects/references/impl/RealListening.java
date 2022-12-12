@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package diarsid.support.objects.references.impl;
 
 import java.util.Objects;
@@ -13,10 +8,6 @@ import diarsid.support.objects.references.Listening;
 
 import static java.util.UUID.randomUUID;
 
-/**
- *
- * @author Diarsid
- */
 class RealListening<T> implements Listening<T> {
 
     private final UUID uuid;

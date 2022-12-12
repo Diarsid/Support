@@ -1,5 +1,6 @@
 package diarsid.support.objects.references.impl;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -8,7 +9,7 @@ import diarsid.support.objects.references.Present;
 import static java.util.Objects.requireNonNull;
 
 import static diarsid.support.objects.references.Reference.Type.VALUE;
-import static diarsid.support.objects.references.Reference.ValuePresence.PRESENT;
+import static diarsid.support.objects.references.Reference.ValuePresence.NON_NULL;
 
 public class SimplePresent<T> implements Present<T> {
 
@@ -22,6 +23,11 @@ public class SimplePresent<T> implements Present<T> {
     @Override
     public T get() {
         return this.t;
+    }
+
+    @Override
+    public <R> Readable.NonNull<R> map(Function<T, R> mapper) {
+        return new SimplePresent<>(mapper.apply(this.t));
     }
 
     @Override
@@ -71,11 +77,37 @@ public class SimplePresent<T> implements Present<T> {
 
     @Override
     public ValuePresence valuePresence() {
-        return PRESENT;
+        return NON_NULL;
     }
 
     @Override
     public Type type() {
         return VALUE;
+    }
+
+    @Override
+    public boolean notEqualsToOther(Readable<T> readableT) {
+        if ( readableT instanceof Readable.NonNull ) {
+            return Objects.equals(this.t, readableT.get());
+        }
+        else if ( readableT instanceof Readable.Nullable ) {
+            return Objects.equals(this.t, ((Readable.Nullable<T>) readableT).or(null) );
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SimplePresent)) return false;
+        SimplePresent<?> that = (SimplePresent<?>) o;
+        return t.equals(that.t);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(t);
     }
 }

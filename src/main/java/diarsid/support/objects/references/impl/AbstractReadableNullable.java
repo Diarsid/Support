@@ -17,7 +17,7 @@ import static diarsid.support.objects.references.Reference.ValuePresence.NULLABL
 
 class AbstractReadableNullable<T> implements Reference.Readable.Nullable<T> {
 
-    protected T t;
+    protected volatile T t;
 
     AbstractReadableNullable() {
         this.t = null;

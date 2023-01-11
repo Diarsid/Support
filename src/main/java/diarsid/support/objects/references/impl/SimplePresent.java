@@ -13,7 +13,7 @@ import static diarsid.support.objects.references.Reference.ValuePresence.NON_NUL
 
 public class SimplePresent<T> implements Present<T> {
 
-    private T t;
+    private volatile T t;
 
     public SimplePresent(T t) {
         requireNonNull(t);

@@ -11,7 +11,7 @@ import static java.util.Objects.isNull;
 
 public class SimplePossible<T> extends AbstractReadableNullable<T> implements Possible<T> {
 
-    protected T t;
+    protected volatile T t;
 
     public SimplePossible() {
         super();
@@ -53,7 +53,7 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
 
     @Override
     public T orOther(Possible<T> otherPossibleT) {
-        return isNull(this.t) ? otherPossibleT.orThrow() : t;
+        return isNull(this.t) ? otherPossibleT.orThrow() : this.t;
     }
     
     @Override

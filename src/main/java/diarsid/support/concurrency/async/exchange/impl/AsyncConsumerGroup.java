@@ -49,7 +49,7 @@ class AsyncConsumerGroup<T>
             this.consumerGroup = consumerGroup;
             this.consumer = consumer;
             this.isWorking = new AtomicBoolean(true);
-            this.input = new ReentrantLock();
+            this.input = new ReentrantLock(true);
             this.inputAppear = this.input.newCondition();
             this.asyncListenForInput = this.exchangePoint.namedThreadSource.newNamedFixedThreadPool(format("%s[%s].Listener", AsyncExchangePoint.AsyncConsumer.class.getSimpleName(), consumer.name()), 1);
 

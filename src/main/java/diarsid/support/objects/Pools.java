@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package diarsid.support.objects;
 
 import java.lang.reflect.Constructor;
@@ -14,16 +9,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.slf4j.LoggerFactory;
+
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
-import static diarsid.support.log.Logging.logFor;
 
-
-/**
- *
- * @author Diarsid
- */
 public class Pools {    
     
     private static final Pools SINGLETON;
@@ -55,7 +46,7 @@ public class Pools {
             if ( existedGuardedPool == null ) {
                 GuardedPool<T> newTGuardedPool = new GuardedPool<>(tSupplier);
                 poolsByPooledClasses.put(type, newTGuardedPool);
-                logFor(Pools.class).info(format("Pool for %s created.", type.getCanonicalName()));
+                LoggerFactory.getLogger(Pools.class).info(format("Pool for %s created.", type.getCanonicalName()));
                 existedGuardedPool = newTGuardedPool;
             }
             return existedGuardedPool;
@@ -87,7 +78,7 @@ public class Pools {
         try {            
             return pooledObjectOperation.apply(pooled);
         } catch (Throwable t) {
-            logFor(Pools.class).error("Exception during pooled object use:", t);
+            LoggerFactory.getLogger(Pools.class).error("Exception during pooled object use:", t);
             throw t;
         } finally {
             giveBackToPool(pooled);
@@ -100,7 +91,7 @@ public class Pools {
         try {            
             pooledObjectOperation.accept(pooled);
         } catch (Throwable t) {
-            logFor(Pools.class).error("Exception during pooled object use:", t);
+            LoggerFactory.getLogger(Pools.class).error("Exception during pooled object use:", t);
         } finally {
             giveBackToPool(pooled);
         }

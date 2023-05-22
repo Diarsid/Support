@@ -15,7 +15,6 @@ module diarsid.support {
     exports diarsid.support.configuration;
     exports diarsid.support.exceptions;
     exports diarsid.support.functional;
-    exports diarsid.support.log;
     exports diarsid.support.lang;
     exports diarsid.support.metainfo;
     exports diarsid.support.misc;

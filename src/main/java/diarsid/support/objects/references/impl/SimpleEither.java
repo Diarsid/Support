@@ -25,17 +25,10 @@ public final class SimpleEither<P, S> extends SimplePossible<P> implements Eithe
     public SimpleEither(S secondary) {
         super();
         this.presence = SECONDARY;
-        this.secondary = null;
+        this.secondary = secondary;
     }
 
-    public static <P, S> SimpleEither<P, S> withPrimary(P primary) {
-        return new SimpleEither<>(primary, true);
-    }
-
-    public static <P, S> SimpleEither<P, S> withSecondary(S secondary) {
-        return new SimpleEither<>(secondary);
-    }
-
+    @Override
     public P primaryOrThrow(Function<S, RuntimeException> exceptionOfSecondary) {
         if ( this.presence.is(PRIMARY) ) {
             return super.t;
@@ -45,6 +38,7 @@ public final class SimpleEither<P, S> extends SimplePossible<P> implements Eithe
         }
     }
 
+    @Override
     public S secondaryOrThrow(Function<P, RuntimeException> exceptionOfSecondary) {
         if ( this.presence.is(SECONDARY) ) {
             return this.secondary;

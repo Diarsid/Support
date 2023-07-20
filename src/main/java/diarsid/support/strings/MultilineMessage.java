@@ -1,15 +1,18 @@
 package diarsid.support.strings;
 
-import java.util.Arrays;
 import java.util.List;
 
+import diarsid.support.strings.split.Split;
+import diarsid.support.strings.split.SplitByString;
+
 import static java.lang.String.format;
-import static java.lang.System.in;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 
 public class MultilineMessage {
+
+    private static final Split SPLIT_BY_LINE_SEPARATOR = new SplitByString(lineSeparator());
 
     public enum IndentLevel {
 
@@ -156,25 +159,10 @@ public class MultilineMessage {
         return message.toString();
     }
 
-    public List<String> composeAsLines() {
+    public List<String> composeToLines() {
         String source = this.compose();
 
-        return asList(source.split(SEPARATOR));
-    }
-
-    public static void main(String[] args) {
-        MultilineMessage message = new MultilineMessage("[]", "    ");
-        message.newLine();
-        message.newLine().add("aaa");
-        message.newLine();
-        message.newLine();
-        message.newLine().add("bbb");
-        message.newLine();
-        message.newLine().add("ccc");
-        message.newLine();
-
-        List<String> strings = message.composeAsLines();
-        int f = 5;
+        return SPLIT_BY_LINE_SEPARATOR.process(source);
     }
 
     @Override

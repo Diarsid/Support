@@ -1,7 +1,12 @@
 package diarsid.support.strings;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static java.lang.String.format;
+import static java.lang.System.in;
 import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 
 public class MultilineMessage {
@@ -53,6 +58,18 @@ public class MultilineMessage {
         this.message = new StringBuilder();
     }
 
+    private String indentStringOfLevel(int level) {
+        String indents;
+        if ( level == 0 ) {
+            indents = "";
+        }
+        else {
+            indents = indent.repeat(level);
+        }
+
+        return indents;
+    }
+
     public MultilineMessage newLine() {
         message.append(SEPARATOR).append(prefix);
         return this;
@@ -64,7 +81,7 @@ public class MultilineMessage {
     }
 
     public MultilineMessage indent(int level) {
-        message.append(indent.repeat(level));
+        message.append(this.indentStringOfLevel(level));
         return this;
     }
 
@@ -114,13 +131,7 @@ public class MultilineMessage {
     }
 
     public MultilineMessage addAsLines(StackTraceElement[] stackTraceElements, int indentsLevel) {
-        String indentLine = "";
-
-        for (int i = 0; i < indentsLevel; i++) {
-            indentLine = indentLine + indent;
-        }
-
-        String indents = indentLine;
+        String indents = this.indentStringOfLevel(indentsLevel);
 
         stream(stackTraceElements).forEach(element -> {
             this.newLine().add(indents).add(element.toString());
@@ -129,8 +140,41 @@ public class MultilineMessage {
         return this;
     }
 
+    public MultilineMessage addAsLines(List<String> strings) {
+        return this;
+    }
+
+    public MultilineMessage addAsLines(List<String> strings, int indentsLevel) {
+        String indents = this.indentStringOfLevel(indentsLevel);
+
+        strings.forEach(string -> this.newLine().add(indents).add(string));
+
+        return this;
+    }
+
     public String compose() {
         return message.toString();
+    }
+
+    public List<String> composeAsLines() {
+        String source = this.compose();
+
+        return asList(source.split(SEPARATOR));
+    }
+
+    public static void main(String[] args) {
+        MultilineMessage message = new MultilineMessage("[]", "    ");
+        message.newLine();
+        message.newLine().add("aaa");
+        message.newLine();
+        message.newLine();
+        message.newLine().add("bbb");
+        message.newLine();
+        message.newLine().add("ccc");
+        message.newLine();
+
+        List<String> strings = message.composeAsLines();
+        int f = 5;
     }
 
     @Override

@@ -32,5 +32,6 @@ module diarsid.support {
     exports diarsid.support.strings;
     exports diarsid.support.strings.model;
     exports diarsid.support.strings.replace;
+    exports diarsid.support.strings.split;
     exports diarsid.support.time;
 }

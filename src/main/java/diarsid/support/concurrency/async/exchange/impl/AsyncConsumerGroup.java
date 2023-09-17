@@ -51,7 +51,9 @@ class AsyncConsumerGroup<T>
             this.isWorking = new AtomicBoolean(true);
             this.input = new ReentrantLock(true);
             this.inputAppear = this.input.newCondition();
-            this.asyncListenForInput = this.exchangePoint.namedThreadSource.newNamedFixedThreadPool(format("%s[%s].Listener", AsyncExchangePoint.AsyncConsumer.class.getSimpleName(), consumer.name()), 1);
+            this.asyncListenForInput = this.exchangePoint.namedThreadSource.newNamedFixedThreadPool(
+                    format("%s[%s].Listener", AsyncExchangePoint.AsyncConsumer.class.getSimpleName(), consumer.name()),
+                    1);
 
             String asyncConsumeName = format("%s[%s]", AsyncExchangePoint.AsyncConsumer.class.getSimpleName(), consumer.name());
             AsyncExchangePoint.AsyncConsumer.ConcurrencyMode concurrencyMode = this.consumer.concurrencyMode();
@@ -69,6 +71,8 @@ class AsyncConsumerGroup<T>
         }
 
         private void awaitForInputLoop() {
+            boolean holderIsNotWorkingAndConsumerGroupClosed;
+
             awaitForInputLoop: while ( this.isWorking.get() && this.consumerGroup.isOpen.get() ) {
                 this.input.lock();
                 try {
@@ -77,7 +81,8 @@ class AsyncConsumerGroup<T>
                     } while ( ! this.inputAppearSignaled );
                     this.inputAppearSignaled = false;
 
-                    if ( ! (this.isWorking.get() && this.consumerGroup.isOpen.get()) ) {
+                    holderIsNotWorkingAndConsumerGroupClosed = ! (this.isWorking.get() && this.consumerGroup.isOpen.get());
+                    if ( holderIsNotWorkingAndConsumerGroupClosed ) {
                         break awaitForInputLoop;
                     }
                     T data = this.inputData;
@@ -139,7 +144,7 @@ class AsyncConsumerGroup<T>
                     break;
                 }
 
-                this.doSynchronizedVoidChange(() -> {
+                this.doSynchronizedVoidRead(() -> {
                     this.consumerHoldersToAwake.addAll(this.consumerHoldersByNames.values());
                 });
 
@@ -171,7 +176,7 @@ class AsyncConsumerGroup<T>
 
     @Override
     public boolean add(AsyncExchangePoint.AsyncConsumer<T> consumer) {
-        return super.doSynchronizedReturnRead(() -> {
+        return super.doSynchronizedReturnChange(() -> {
             if ( ! this.isOpen.get() ) {
                 return false;
             }
@@ -185,7 +190,7 @@ class AsyncConsumerGroup<T>
 
     @Override
     public boolean remove(String consumerName) {
-        AsyncConsumerHolder<T> holder = super.doSynchronizedReturnRead(() -> {
+        AsyncConsumerHolder<T> holder = super.doSynchronizedReturnChange(() -> {
             return this.consumerHoldersByNames.remove(consumerName);
         });
 
@@ -200,12 +205,14 @@ class AsyncConsumerGroup<T>
     @Override
     protected boolean doSynchronizedDestroy() {
         this.isOpen.set(false);
+
+        this.asyncAwaitOnQueueLoop.cancel(true);
+
         for ( var holder : this.consumerHoldersByNames.values() ) {
             holder.stop();
         }
         this.consumerHoldersByNames.clear();
 
-        this.asyncAwaitOnQueueLoop.cancel(true);
         shutdownAndWait(this.async);
 
         return true;

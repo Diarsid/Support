@@ -1,6 +1,7 @@
 package diarsid.support.objects.references;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import diarsid.support.objects.references.impl.ResultCompleted;
 import diarsid.support.objects.references.impl.ResultEmpty;
@@ -71,6 +72,8 @@ public interface Result<T> extends Reference.Readable.Nullable<T> {
     }
 
     Reason reason();
+
+    T orThrow(Function<Reason, ? extends RuntimeException> exceptionCreator);
 
     default void doWhenEmpty(Consumer<Reason> doWithReason) {
         if ( this.isEmpty() ) {

@@ -11,8 +11,6 @@ import static java.util.Objects.isNull;
 
 public class SimplePossible<T> extends AbstractReadableNullable<T> implements Possible<T> {
 
-    protected volatile T t;
-
     public SimplePossible() {
         super();
     }
@@ -24,7 +22,7 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
     @Override
     public <R> Possible<R> map(Function<T, R> mapper) {
         if ( this.isPresent() ) {
-            return new SimplePossible<>(mapper.apply(this.t));
+            return new SimplePossible<>(mapper.apply(super.t));
         } else {
             return new SimplePossible<>();
         }
@@ -43,7 +41,7 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
 
     @Override
     public T extractOr(T other) {
-        if ( isNull(this.t) ) {
+        if ( isNull(super.t) ) {
             return other;
         }
         else {
@@ -53,35 +51,35 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
 
     @Override
     public T orOther(Possible<T> otherPossibleT) {
-        return isNull(this.t) ? otherPossibleT.orThrow() : this.t;
+        return isNull(super.t) ? otherPossibleT.orThrow() : super.t;
     }
     
     @Override
     public T resetTo(T newT) {
         if ( this.isPresent() && this.equalsTo(newT) ) {
-            return this.t;
+            return super.t;
         }
 
         if ( this.isNotPresent() && isNull(newT) ) {
-            return this.t;
+            return super.t;
         }
 
-        T oldT = this.t;
+        T oldT = super.t;
         this.internalSet(newT);
         return oldT;
     }
 
 //    @Override
 //    public T modify(Function<T, T> oldToNew) {
-//        T oldT = this.t;
+//        T oldT = super.t;
 //        T newT = oldToNew.apply(oldT);
 //
 //        if ( this.isPresent() && this.equalsTo(newT) ) {
-//            return this.t;
+//            return super.t;
 //        }
 //
 //        if ( this.isNotPresent() && isNull(newT) ) {
-//            return this.t;
+//            return super.t;
 //        }
 //
 //        this.internalSet(newT);
@@ -105,23 +103,23 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
 
     @Override
     public T modifyNullable(Function<T, T> oldNullableToNew) {
-        return this.resetTo(oldNullableToNew.apply(this.t));
+        return this.resetTo(oldNullableToNew.apply(super.t));
     }
 
     @Override
     public T modifyIfPresent(Function<T, T> oldNullableToNew) {
         if ( this.isPresent() ) {
-            return this.resetTo(oldNullableToNew.apply(this.t));
+            return this.resetTo(oldNullableToNew.apply(super.t));
         }
-        return this.t;
+        return super.t;
     }
 
     @Override
     public T modifyIfPresent(Consumer<T> mutateOldTWhenPresent) {
         if ( this.isPresent() ) {
-            mutateOldTWhenPresent.accept(this.t);
+            mutateOldTWhenPresent.accept(super.t);
         }
-        return this.t;
+        return super.t;
     }
 
     @Override
@@ -149,7 +147,7 @@ public class SimplePossible<T> extends AbstractReadableNullable<T> implements Po
     
     @Override
     public T nullify() {
-        T oldT = this.t;
+        T oldT = super.t;
         this.internalSet(null);
         return oldT;
     }

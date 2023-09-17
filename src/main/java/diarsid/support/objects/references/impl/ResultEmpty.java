@@ -126,7 +126,7 @@ public class ResultEmpty<T> implements Result<T>, Result.Reason {
 
     @Override
     public T orThrow() {
-        throw new NullPointerException();
+        throw new NullPointerException(this.reason.toString());
     }
 
     @Override
@@ -147,6 +147,11 @@ public class ResultEmpty<T> implements Result<T>, Result.Reason {
     @Override
     public Reason reason() {
         return this;
+    }
+
+    @Override
+    public T orThrow(Function<Reason, ? extends RuntimeException> exceptionCreator) {
+        throw exceptionCreator.apply(this.reason());
     }
 
     @Override

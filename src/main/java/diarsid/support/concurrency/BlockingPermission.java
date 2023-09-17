@@ -7,15 +7,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Permission {
+public class BlockingPermission {
 
-    private static final Logger log = LoggerFactory.getLogger(Permission.class);
+    private static final Logger log = LoggerFactory.getLogger(BlockingPermission.class);
 
     private final Lock lock;
     private final Condition condition;
     private volatile boolean forbidden;
 
-    public Permission() {
+    public BlockingPermission() {
         this.lock = new ReentrantLock(true);
         this.condition = this.lock.newCondition();
     }

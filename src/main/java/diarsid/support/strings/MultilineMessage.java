@@ -1,6 +1,8 @@
 package diarsid.support.strings;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import diarsid.support.strings.split.Split;
 import diarsid.support.strings.split.SplitByString;
@@ -9,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Objects.isNull;
 
 public class MultilineMessage {
 
@@ -31,11 +34,35 @@ public class MultilineMessage {
         }
     }
 
+    private final static class VerticalMap {
+
+        private final static class Pair {
+
+            private final String key;
+            private final String value;
+
+            public Pair(String key, String value) {
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        private final int position;
+        private final List<Pair> map;
+
+        public VerticalMap(int position) {
+            this.position = position;
+            this.map = new ArrayList<>();
+        }
+    }
+
     private final static String SEPARATOR = lineSeparator();
+    private static final String VERTICAL_MAP_DEFAULT_SEPARATOR = " : ";
 
     private final StringBuilder message;
     private final String prefix;
     private final String indent;
+    private List<VerticalMap> verticalMaps;
 
     public MultilineMessage() {
         this.prefix = "";
@@ -151,6 +178,56 @@ public class MultilineMessage {
         String indents = this.indentStringOfLevel(indentsLevel);
 
         strings.forEach(string -> this.newLine().add(indents).add(string));
+
+        return this;
+    }
+
+    private void addNewLineIfNotStartsWithNewLine() {
+//        if ( prefix.length() > 0 ) {
+//            int lastIndexOfPrefix = message.lastIndexOf(prefix);
+//            if ( )
+//            int lastIndexOfSeparator = message.lastIndexOf(SEPARATOR);
+//        }
+//        else {
+//
+//        }
+    }
+
+    public MultilineMessage verticalMapBegins() {
+        return verticalMapBegins(VERTICAL_MAP_DEFAULT_SEPARATOR);
+    }
+
+    public MultilineMessage verticalMapBegins(String separator) {
+//        addNewLineIfNotStartsWithNewLine();
+//        if ( isNull(verticalMaps) ) {
+//            verticalMaps = new VerticalMap();
+//        }
+//
+        return this;
+    }
+
+    public MultilineMessage verticalMapKeyBegins() {
+        return this;
+    }
+
+    public MultilineMessage verticalMapValueBegins() {
+        return this;
+    }
+
+    private boolean isInMapMode() {
+        return false;
+    }
+
+    public MultilineMessage verticalMapEnds() {
+
+        return this;
+    }
+
+    public MultilineMessage tableBegins(int columns) {
+        return this;
+    }
+
+    public MultilineMessage tableEnds() {
 
         return this;
     }

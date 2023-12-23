@@ -72,7 +72,7 @@ public class ParallelTimer {
             return;
         }
 
-        Timing last = threadTimings.getLast();
+        Timing last = threadTimings.get(threadTimings.size()-1);
         last.millis = stop - last.start;
     }
 

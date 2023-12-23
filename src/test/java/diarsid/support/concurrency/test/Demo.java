@@ -1,9 +1,11 @@
 package diarsid.support.concurrency.test;
 
-import static diarsid.support.concurrency.test.CurrentThread.async;
-import static diarsid.support.concurrency.test.CurrentThread.awaitFor;
-import static diarsid.support.concurrency.test.CurrentThread.awaitForAll;
-import static diarsid.support.concurrency.test.CurrentThread.blocking;
+import diarsid.support.tests.concurrency.Steps;
+
+import static diarsid.support.tests.concurrency.CurrentThread.async;
+import static diarsid.support.tests.concurrency.CurrentThread.awaitFor;
+import static diarsid.support.tests.concurrency.CurrentThread.awaitForAll;
+import static diarsid.support.tests.concurrency.CurrentThread.blocking;
 
 public class Demo {
 

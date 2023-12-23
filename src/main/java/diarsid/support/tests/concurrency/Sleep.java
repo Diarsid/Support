@@ -1,13 +1,11 @@
-package diarsid.support.concurrency.test;
+package diarsid.support.tests.concurrency;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 

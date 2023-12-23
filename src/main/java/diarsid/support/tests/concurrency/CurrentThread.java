@@ -1,12 +1,12 @@
-package diarsid.support.concurrency.test;
+package diarsid.support.tests.concurrency;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
-import static diarsid.support.concurrency.test.SleepData.ASYNC;
-import static diarsid.support.concurrency.test.SleepData.BLOCKING;
+import static diarsid.support.tests.concurrency.SleepData.ASYNC;
+import static diarsid.support.tests.concurrency.SleepData.BLOCKING;
 
 public interface CurrentThread {
 

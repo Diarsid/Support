@@ -1,4 +1,4 @@
-package diarsid.support.concurrency.test;
+package diarsid.support.tests.concurrency;
 
 import java.util.ArrayList;
 import java.util.List;

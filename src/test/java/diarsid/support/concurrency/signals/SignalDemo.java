@@ -5,9 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import diarsid.support.concurrency.signals.impl.SignalsRuntimeImpl;
-
-import static diarsid.support.concurrency.test.CurrentThread.async;
+import static diarsid.support.tests.concurrency.CurrentThread.async;
 import static diarsid.support.concurrency.threads.ThreadsUtil.sleepSafely;
 
 public class SignalDemo {

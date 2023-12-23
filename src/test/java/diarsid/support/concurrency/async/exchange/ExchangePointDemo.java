@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import diarsid.support.concurrency.async.exchange.api.AsyncExchangePoint;
 
-import static diarsid.support.concurrency.test.CurrentThread.async;
-import static diarsid.support.concurrency.test.CurrentThread.blocking;
+import static diarsid.support.tests.concurrency.CurrentThread.async;
+import static diarsid.support.tests.concurrency.CurrentThread.blocking;
 import static diarsid.support.concurrency.threads.ThreadsUtil.sleepSafely;
 
 public class ExchangePointDemo {

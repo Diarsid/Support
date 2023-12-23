@@ -10,7 +10,6 @@ module diarsid.support {
     exports diarsid.support.concurrency.async.provider;
     exports diarsid.support.concurrency.signals;
     exports diarsid.support.concurrency.stateful.workers;
-    exports diarsid.support.concurrency.test;
     exports diarsid.support.concurrency.threads;
     exports diarsid.support.configuration;
     exports diarsid.support.exceptions;
@@ -33,5 +32,7 @@ module diarsid.support {
     exports diarsid.support.strings.model;
     exports diarsid.support.strings.replace;
     exports diarsid.support.strings.split;
+    exports diarsid.support.tests;
+    exports diarsid.support.tests.concurrency;
     exports diarsid.support.time;
 }

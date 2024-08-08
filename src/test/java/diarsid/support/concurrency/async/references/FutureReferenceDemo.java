@@ -7,7 +7,7 @@ import static diarsid.support.tests.concurrency.CurrentThread.blocking;
 public class FutureReferenceDemo {
 
     public static void main(String[] args) {
-        FutureReference<String> ref = new ReadWriteFutureReference<>();
+        FutureReference<String> ref = new ReadWriteFutureReference<>(String.class);
 
         async()
                 .action(() -> {

@@ -1,5 +1,7 @@
 package diarsid.support.concurrency.async.references;
 
+import diarsid.support.exceptions.InvalidLogicException;
+
 public interface FutureReference<T> {
 
     interface Read<T> {
@@ -9,7 +11,7 @@ public interface FutureReference<T> {
 
     interface Write<T> {
 
-        boolean set(T t);
+        boolean set(T t) throws InvalidLogicException;
     }
 
     Read<T> read();

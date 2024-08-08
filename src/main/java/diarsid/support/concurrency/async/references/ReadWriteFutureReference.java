@@ -1,9 +1,13 @@
 package diarsid.support.concurrency.async.references;
 
+import java.util.Objects;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import diarsid.support.exceptions.InvalidLogicException;
+
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 public class ReadWriteFutureReference<T> implements
@@ -11,59 +15,66 @@ public class ReadWriteFutureReference<T> implements
         FutureReference.Read<T>,
         FutureReference.Write<T> {
 
-    private T t;
-    private final Lock lock;
-    private final Condition condition;
-    private boolean conditionNotSignalled;
+    private final Class<T> refType;
+    private final Lock refAccess;
+    private final Condition refWritten;
 
-    public ReadWriteFutureReference() {
-        this.lock = new ReentrantLock();
-        this.condition = this.lock.newCondition();
-        this.conditionNotSignalled = true;
+    private boolean refNotWritten;
+    private T ref;
+
+    public ReadWriteFutureReference(Class<T> type) {
+        this.refType = type;
+        this.refAccess = new ReentrantLock();
+        this.refWritten = this.refAccess.newCondition();
+        this.refNotWritten = true;
     }
 
     @Override
     public T get() throws InterruptedException {
-        if ( nonNull(this.t) ) {
-            return this.t;
+        if ( nonNull(this.ref) ) {
+            return this.ref;
         }
 
-        this.lock.lock();
+        this.refAccess.lock();
         try {
-            if ( nonNull(this.t) ) {
-                return t;
+            if ( nonNull(this.ref) ) {
+                return ref;
             }
 
             do {
-                this.condition.await();
-            } while ( this.conditionNotSignalled );
+                this.refWritten.await();
+            } while ( this.refNotWritten );
 
-            return this.t;
+            return this.ref;
         }
         finally {
-            this.lock.unlock();
+            this.refAccess.unlock();
         }
     }
 
     @Override
     public boolean set(T t) {
-        if ( nonNull(this.t) ) {
-            throw new IllegalStateException("is already set!");
+        if ( nonNull(this.ref) ) {
+            throw new InvalidLogicException(format("%s<%s> is already set!",
+                    FutureReference.class.getSimpleName(),
+                    this.refType.getSimpleName()));
         }
 
-        this.lock.lock();
+        this.refAccess.lock();
         try {
-            if ( nonNull(this.t) ) {
-                throw new IllegalStateException("is already set!");
+            if ( nonNull(this.ref) ) {
+                throw new InvalidLogicException(format("%s<%s> is already set!",
+                        FutureReference.class.getSimpleName(),
+                        this.refType.getSimpleName()));
             }
 
-            this.t = t;
-            this.conditionNotSignalled = false;
-            this.condition.signalAll();
+            this.ref = t;
+            this.refNotWritten = false;
+            this.refWritten.signalAll();
             return true;
         }
         finally {
-            this.lock.unlock();
+            this.refAccess.unlock();
         }
     }
 
@@ -75,5 +86,20 @@ public class ReadWriteFutureReference<T> implements
     @Override
     public Write<T> write() {
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReadWriteFutureReference)) return false;
+        ReadWriteFutureReference<?> that = (ReadWriteFutureReference<?>) o;
+        return refNotWritten == that.refNotWritten &&
+                refType.equals(that.refType) &&
+                Objects.equals(ref, that.ref);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(refType, refNotWritten, ref);
     }
 }

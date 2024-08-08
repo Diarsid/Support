@@ -2,7 +2,9 @@ package diarsid.support.concurrency.async.exchange.api;
 
 import java.util.function.Consumer;
 
-import static diarsid.support.concurrency.async.exchange.api.AsyncExchangePoint.AsyncConsumer.ConcurrencyMode.PARALLEL;
+import diarsid.support.concurrency.ConcurrencyMode;
+
+import static diarsid.support.concurrency.ConcurrencyMode.PARALLEL;
 
 public class SimpleAsyncConsumer<T> implements AsyncExchangePoint.AsyncConsumer<T> {
 

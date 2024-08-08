@@ -67,7 +67,6 @@ public class BlockingSourceGroup<T>
         this.isOpen = new AtomicBoolean(true);
         this.exchangePoint = exchangePoint;
         this.sourceHoldersByNames = new ConcurrentHashMap<>();
-        this.startWork();
     }
 
     @Override

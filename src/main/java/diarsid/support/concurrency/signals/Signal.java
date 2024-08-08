@@ -3,7 +3,10 @@ package diarsid.support.concurrency.signals;
 import java.io.Closeable;
 import java.util.function.Consumer;
 
+import diarsid.support.concurrency.ConcurrencyMode;
 import diarsid.support.model.Named;
+
+import static diarsid.support.concurrency.ConcurrencyMode.DEFAULT;
 
 public interface Signal extends Closeable {
 
@@ -41,13 +44,6 @@ public interface Signal extends Closeable {
 
     interface Listener extends Named {
 
-        enum ConcurrencyMode {
-            SEQUENTIAL,
-            PARALLEL;
-
-            public static final ConcurrencyMode DEFAULT = SEQUENTIAL;
-        }
-
         interface OfData extends Listener {
 
             void onEmittedWith(Object data);
@@ -55,8 +51,8 @@ public interface Signal extends Closeable {
 
         void onEmitted();
 
-        default Listener.ConcurrencyMode concurrencyMode() {
-            return ConcurrencyMode.DEFAULT;
+        default ConcurrencyMode concurrencyMode() {
+            return DEFAULT;
         }
     }
 

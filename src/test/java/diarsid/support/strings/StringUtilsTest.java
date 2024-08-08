@@ -13,7 +13,7 @@ import static diarsid.support.strings.StringUtils.splitByTextSeparators;
 import static diarsid.support.strings.StringUtils.splitCamelCase;
 
 import static diarsid.support.strings.StringUtils.countCharMatchesIn;
-import static diarsid.support.strings.StringUtils.countOccurences;
+import static diarsid.support.strings.StringUtils.countOccurrences;
 import static diarsid.support.strings.StringUtils.removeAllSeparators;
 import static diarsid.support.strings.StringUtils.splitToLines;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +30,7 @@ public class StringUtilsTest extends BaseTest {
     
     @Test
     public void countOccurencesTest() {
-        assertThat(countOccurences("ABcABd", "AB")).isEqualTo(2);
+        assertThat(countOccurrences("ABcABd", "AB")).isEqualTo(2);
     }
     
     @Test
@@ -175,6 +175,18 @@ public class StringUtilsTest extends BaseTest {
         List<String> expected = List.of("2", "ABS", "45", "Camel", "XYZ", "123", "Case", "S", "String");
 
         assertThat(words).isEqualTo(expected);
+    }
+
+    @Test
+    public void splitCamelCaseTest_singleWord() {
+        String camelCase = "String";
+        List<String> words0 = splitCamelCase(camelCase, true);
+        List<String> words1 = splitCamelCase(camelCase, true);
+
+        List<String> expected = List.of("String");
+
+        assertThat(words0).isEqualTo(expected);
+        assertThat(words1).isEqualTo(expected);
     }
 
     @Test

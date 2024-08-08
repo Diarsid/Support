@@ -3,9 +3,9 @@ package diarsid.support.concurrency.async.exchange.api;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
+import diarsid.support.concurrency.ConcurrencyMode;
 import diarsid.support.concurrency.async.exchange.impl.AsyncExchangePointImpl;
 import diarsid.support.model.Named;
-import diarsid.support.objects.CommonEnum;
 import diarsid.support.objects.workers.Worker;
 
 public interface AsyncExchangePoint<T> extends Named, Worker.Destroyable {
@@ -31,14 +31,6 @@ public interface AsyncExchangePoint<T> extends Named, Worker.Destroyable {
     }
 
     interface AsyncConsumer<T> extends Named {
-
-        enum ConcurrencyMode implements CommonEnum<ConcurrencyMode> {
-
-            SEQUENTIAL,
-            PARALLEL;
-
-            public static final ConcurrencyMode DEFAULT = SEQUENTIAL;
-        }
 
         void accept(T t) throws Exception;
 

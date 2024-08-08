@@ -26,6 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
+import static diarsid.support.strings.PathUtils.normalizeSeparators;
 import static diarsid.support.strings.replace.Replace.replace;
 
 /**
@@ -263,12 +264,12 @@ public class StringUtils {
         }
     }
     
-    public static int countOccurences(String where, String what) {
+    public static int countOccurrences(String where, String what) {
         int count = 0;
-        int lastOccurence = where.indexOf(what);
-        while ( lastOccurence > -1 ) {
+        int lastOccurrence = where.indexOf(what);
+        while ( lastOccurrence > -1 ) {
             count++;
-            lastOccurence = where.indexOf(what, lastOccurence + 1);
+            lastOccurrence = where.indexOf(what, lastOccurrence + 1);
         }
         return count;
     }

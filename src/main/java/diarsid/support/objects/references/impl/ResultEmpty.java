@@ -115,13 +115,20 @@ public class ResultEmpty<T> implements Result<T>, Result.Reason {
     }
 
     @Override
-    public Nullable<T> orDefault(T defaultT) {
-        return new AbstractReadableNullable<>(defaultT);
+    public Result<T> orDefault(T defaultT) {
+        return new ResultCompleted<>(defaultT);
     }
 
     @Override
-    public <R> Nullable<R> map(Function<T, R> mapper) {
-        return new AbstractReadableNullable<>();
+    @SuppressWarnings("unchecked")
+    public <R> Result<R> map(Function<T, R> mapper) {
+        return (Result<R>) this;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <R> Result<R> flatMap(ResultFunction<T, R> mapper) {
+        return (Result<R>) this;
     }
 
     @Override

@@ -9,18 +9,19 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import diarsid.support.callbacks.BiValueCallback;
+import diarsid.support.callbacks.BiValueListener;
 
+import static java.util.Objects.nonNull;
 import static java.util.UUID.randomUUID;
 
-public class BiValueCallbacks<T1, T2> implements Callbacks<BiValueCallback<T1, T2>> {
+public class BiValueListeners<T1, T2> implements Listeners {
 
-    private final Map<UUID, BiValueCallback<T1, T2>> callbacksByUuid;
+    private final Map<UUID, BiValueListener<T1, T2>> callbacksByUuid;
     private final Lock readLock;
     private final Lock writeLock;
     protected final Object callLock;
 
-    public BiValueCallbacks() {
+    public BiValueListeners() {
         this.callbacksByUuid = new HashMap<>();
         ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
         this.readLock = readWriteLock.readLock();
@@ -28,38 +29,35 @@ public class BiValueCallbacks<T1, T2> implements Callbacks<BiValueCallback<T1, T
         this.callLock = new Object();
     }
 
-    @Override
-    public final ActiveCallback<BiValueCallback<T1, T2>> add(BiValueCallback<T1, T2> callback) {
+    public final void add(BiValueListener<T1, T2> listener) {
         UUID uuid = randomUUID();
         this.writeLock.lock();
         try {
-            this.callbacksByUuid.put(uuid, callback);
+            this.callbacksByUuid.put(uuid, listener);
         }
         finally {
             this.writeLock.unlock();
         }
-        return new ActiveCallback<>(uuid, this);
     }
 
-    public void call(T1 t1, T2 t2) {
-        List<BiValueCallback<T1, T2>> copy = this.createCallbacksListCopySynchronously();
+    public void accept(T1 t1, T2 t2) {
+        List<BiValueListener<T1, T2>> copy = this.createCallbacksListCopySynchronously();
 
         synchronized ( this.callLock ) {
-            for (BiValueCallback<T1, T2> callback : copy) {
+            for (BiValueListener<T1, T2> callback : copy) {
                 try {
-                    callback.call(t1, t2);
+                    callback.accept(t1, t2);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-
     }
 
-    private List<BiValueCallback<T1, T2>> createCallbacksListCopySynchronously() {
+    private List<BiValueListener<T1, T2>> createCallbacksListCopySynchronously() {
         this.readLock.lock();
-        List<BiValueCallback<T1, T2>> copy;
+        List<BiValueListener<T1, T2>> copy;
 
         try {
             copy = new ArrayList<>(this.callbacksByUuid.values());
@@ -71,15 +69,15 @@ public class BiValueCallbacks<T1, T2> implements Callbacks<BiValueCallback<T1, T
     }
 
     @Override
-    public final BiValueCallback<T1, T2> remove(UUID uuid) {
-        BiValueCallback<T1, T2> callback;
+    public final boolean remove(UUID uuid) {
+        BiValueListener<T1, T2> listener;
         this.writeLock.lock();
         try {
-            callback = this.callbacksByUuid.remove(uuid);
+            listener = this.callbacksByUuid.remove(uuid);
         }
         finally {
             this.writeLock.unlock();
         }
-        return callback;
+        return nonNull(listener);
     }
 }

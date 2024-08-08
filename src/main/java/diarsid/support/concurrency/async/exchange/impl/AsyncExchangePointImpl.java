@@ -17,17 +17,22 @@ public class AsyncExchangePointImpl<T> extends AbstractStatefulDestroyableWorker
     final BlockingQueue<T> queue;
 
     public AsyncExchangePointImpl(String name) {
+        this(name, new ArrayBlockingQueue<>(10));
+    }
+
+    public AsyncExchangePointImpl(String name, BlockingQueue<T> queue) {
         super(name);
-        this.queue = new ArrayBlockingQueue<>(10);
+        this.queue = queue;
         this.namedThreadSource = new NamedThreadSource(format("%s[%s]", AsyncExchangePoint.class.getSimpleName(), name));
         this.consumerGroup = new AsyncConsumerGroup<>(this);
         this.sourceGroup = new BlockingSourceGroup<>(this);
-        this.startWork();
     }
 
     @Override
     protected boolean doSynchronizedStartWork() {
-        return false;
+        this.consumerGroup.startWork();
+        this.sourceGroup.startWork();
+        return true;
     }
 
     @Override

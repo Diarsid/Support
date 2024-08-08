@@ -71,9 +71,23 @@ public interface Result<T> extends Reference.Readable.Nullable<T> {
 
     }
 
+    interface ResultFunction<T, R> {
+
+        Result<R> apply(T t);
+    }
+
     Reason reason();
 
     T orThrow(Function<Reason, ? extends RuntimeException> exceptionCreator);
+
+    @Override
+    Result<T> orDefault(T defaultT);
+
+    @Override
+    <R> Result<R> map(Function<T, R> mapper);
+
+
+    <R> Result<R> flatMap(ResultFunction<T, R> mapper);
 
     default void doWhenEmpty(Consumer<Reason> doWithReason) {
         if ( this.isEmpty() ) {

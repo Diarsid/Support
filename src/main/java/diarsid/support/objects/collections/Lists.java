@@ -1,6 +1,7 @@
 package diarsid.support.objects.collections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +22,7 @@ public class Lists {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static boolean containsSameElements(List a, List b) {
+    public static boolean containsSameElements(Collection a, Collection b) {
         if ( a.isEmpty() || b.isEmpty() ) {
             return false;
         }

@@ -11,14 +11,16 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import diarsid.support.concurrency.ConcurrencyMode;
 import diarsid.support.concurrency.async.exchange.api.AsyncExchangePoint;
 import diarsid.support.concurrency.stateful.workers.AbstractStatefulDestroyableWorker;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
-import static diarsid.support.concurrency.async.exchange.api.AsyncExchangePoint.AsyncConsumer.ConcurrencyMode.PARALLEL;
-import static diarsid.support.concurrency.async.exchange.api.AsyncExchangePoint.AsyncConsumer.ConcurrencyMode.SEQUENTIAL;
+import static diarsid.support.concurrency.ConcurrencyMode.PARALLEL;
+import static diarsid.support.concurrency.ConcurrencyMode.SEQUENTIAL;
 import static diarsid.support.concurrency.threads.ThreadsUtil.shutdownAndWait;
 
 class AsyncConsumerGroup<T>
@@ -32,7 +34,7 @@ class AsyncConsumerGroup<T>
         private final AsyncExchangePoint.AsyncConsumer<T> consumer;
         private final ExecutorService asyncListenForInput;
         private final ExecutorService asyncConsumeInput;
-        private final Future<?> asyncAwaitForInputLoop;
+        private final Future<?> asyncLoopAwaitForInput;
 
         final AtomicBoolean isWorking;
 
@@ -56,7 +58,7 @@ class AsyncConsumerGroup<T>
                     1);
 
             String asyncConsumeName = format("%s[%s]", AsyncExchangePoint.AsyncConsumer.class.getSimpleName(), consumer.name());
-            AsyncExchangePoint.AsyncConsumer.ConcurrencyMode concurrencyMode = this.consumer.concurrencyMode();
+            ConcurrencyMode concurrencyMode = this.consumer.concurrencyMode();
             if ( concurrencyMode.is(SEQUENTIAL) ) {
                 this.asyncConsumeInput = this.exchangePoint.namedThreadSource.newNamedFixedThreadPool(asyncConsumeName, 1);
             }
@@ -67,7 +69,7 @@ class AsyncConsumerGroup<T>
                 throw concurrencyMode.unsupported();
             }
 
-            this.asyncAwaitForInputLoop = this.asyncListenForInput.submit(this::awaitForInputLoop);
+            this.asyncLoopAwaitForInput = this.asyncListenForInput.submit(this::awaitForInputLoop);
         }
 
         private void awaitForInputLoop() {
@@ -112,7 +114,7 @@ class AsyncConsumerGroup<T>
 
         void stop() {
             this.isWorking.set(false);
-            this.asyncAwaitForInputLoop.cancel(true);
+            this.asyncLoopAwaitForInput.cancel(true);
             shutdownAndWait(this.asyncListenForInput);
             shutdownAndWait(this.asyncConsumeInput);
         }
@@ -123,7 +125,7 @@ class AsyncConsumerGroup<T>
     private final Map<String, AsyncConsumerHolder<T>> consumerHoldersByNames;
     private final List<AsyncConsumerHolder<T>> consumerHoldersToAwake;
     private final ExecutorService async;
-    private final Future<?> asyncAwaitOnQueueLoop;
+    private Future<?> asyncAwaitOnQueueLoop;
 
     public AsyncConsumerGroup(AsyncExchangePointImpl<T> exchangePoint) {
         super(exchangePoint.name() + "." + AsyncExchangePoint.AsyncConsumer.Group.class.getSimpleName());
@@ -132,8 +134,6 @@ class AsyncConsumerGroup<T>
         this.consumerHoldersByNames = new ConcurrentHashMap<>();
         this.consumerHoldersToAwake = new ArrayList<>();
         this.async = exchangePoint.namedThreadSource.newNamedFixedThreadPool(name(), 1);
-        this.asyncAwaitOnQueueLoop = this.async.submit(this::awaitOnQueueLoop);
-        this.startWork();
     }
 
     private void awaitOnQueueLoop() {
@@ -171,6 +171,7 @@ class AsyncConsumerGroup<T>
 
     @Override
     protected boolean doSynchronizedStartWork() {
+        this.asyncAwaitOnQueueLoop = this.async.submit(this::awaitOnQueueLoop);
         return true;
     }
 
@@ -206,7 +207,9 @@ class AsyncConsumerGroup<T>
     protected boolean doSynchronizedDestroy() {
         this.isOpen.set(false);
 
-        this.asyncAwaitOnQueueLoop.cancel(true);
+        if ( nonNull(this.asyncAwaitOnQueueLoop) ) {
+            this.asyncAwaitOnQueueLoop.cancel(true);
+        }
 
         for ( var holder : this.consumerHoldersByNames.values() ) {
             holder.stop();
